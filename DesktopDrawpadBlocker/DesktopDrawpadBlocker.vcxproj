@@ -131,6 +131,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DdbConfiguration.cpp" />
+    <ClCompile Include="DdbIntercept.cpp" />
+    <ClCompile Include="DdbIO.cpp" />
     <ClCompile Include="DdbMain.cpp" />
     <ClCompile Include="IdtGuid.cpp" />
     <ClCompile Include="IdtOther.cpp" />
@@ -140,6 +143,9 @@
     <ClCompile Include="JsonCpp\lib_json\json_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DdbConfiguration.h" />
+    <ClInclude Include="DdbIntercept.h" />
+    <ClInclude Include="DdbIO.h" />
     <ClInclude Include="DdbMain.h" />
     <ClInclude Include="IdtGuid.h" />
     <ClInclude Include="IdtOther.h" />

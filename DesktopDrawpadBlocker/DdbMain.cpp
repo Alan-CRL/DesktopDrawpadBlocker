@@ -15,16 +15,19 @@
 
 #include "DdbMain.h"
 
-#include "IdtText.h"
-#include "IdtOther.h"
+#include "DdbConfiguration.h"
+#include "DdbIntercept.h"
+#include "DdbIntercept.h"
 #include "IdtGuid.h"
+#include "IdtOther.h"
+#include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240505a";				//发布版本
+string editionDate = "20240506a";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
-shared_ptr<spdlog::logger> DDBLogger;
+shared_ptr<spdlog::logger> DDBLogger;			//日志记录器
 
 int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int /*nCmdShow*/)
 {
@@ -41,6 +44,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 	{
 		error_code ec;
 		if (_waccess((StringToWstring(globalPath) + L"log").c_str(), 0) == -1) filesystem::create_directory(StringToWstring(globalPath) + L"log", ec);
+		else if (_waccess((StringToWstring(globalPath) + L"log\\Ddb.log").c_str(), 0) == 0) filesystem::remove(StringToWstring(globalPath) + L"log\\Ddb.log", ec);
 
 		auto DDBLoggerFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(globalPath + "log\\Ddb.log");
 
@@ -59,6 +63,80 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		//logger->warn("");
 		//logger->error("");
 		//logger->critical("");
+	}
+
+	// 配置文件初始化
+	{
+		if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1 || !ConfigurationChange() || CloseSoftware())
+		{
+			WriteSetting(true);
+			return 0;
+		}
+
+		ReadSetting();
+		WriteSetting();
+	}
+	// 拦截配置初始化
+	{
+		{
+			// AiClass 桌面悬浮窗
+			WindowSearch[0].hasClassName = true;
+			WindowSearch[0].className = L"UIWndTransparent";
+			WindowSearch[0].hasWindowTitle = true;
+			WindowSearch[0].windowTitle = L"TransparentWindow";
+			WindowSearch[0].hasStyle = true;
+			WindowSearch[0].style = -2080374784;
+		}
+		{
+			// 希沃白板 桌面悬浮窗
+			WindowSearch[1].hasClassName = true;
+			WindowSearch[1].className = L"HwndWrapper[EasiNote";
+			WindowSearch[1].hasStyle = true;
+			WindowSearch[1].style = 369623040;
+			WindowSearch[1].hasWidthHeight = true;
+			WindowSearch[1].width = 550;
+			WindowSearch[1].height = 200;
+		}
+		{
+			// 希沃品课（桌面悬浮窗和PPT控件）
+			WindowSearch[2].hasClassName = true;
+			WindowSearch[2].className = L"Chrome_WidgetWin_1";
+			WindowSearch[2].hasWindowTitle = true;
+			WindowSearch[2].windowTitle = L"希沃品课——integration";
+			WindowSearch[2].hasStyle = true;
+			WindowSearch[2].style = 335675392;
+		}
+		{
+			// 希沃品课 桌面画板
+			WindowSearch[3].hasClassName = true;
+			WindowSearch[3].className = L"HwndWrapper[BoardService;;";
+			WindowSearch[3].hasStyle = true;
+			WindowSearch[3].style = 369623040;
+		}
+		{
+			// 希沃PPT小工具
+			WindowSearch[4].hasClassName = true;
+			WindowSearch[4].className = L"HwndWrapper[PPTService.exe;;";
+			WindowSearch[4].hasStyle = true;
+			WindowSearch[4].style = 369623040;
+		}
+		WindowSearchSize = 5;
+	}
+
+	// 开始拦截悬浮窗
+	for (;; this_thread::sleep_for(chrono::milliseconds(setList.sleepTime)))
+	{
+		// 查询配置文件是否修改
+		if (ConfigurationChange())
+		{
+			ReadSetting();
+			WriteSetting();
+		}
+		// 查询程序是否需要关闭
+		if (CloseSoftware()) break;
+
+		// 拦截窗口
+		DdbIntercept();
 	}
 
 	return 0;

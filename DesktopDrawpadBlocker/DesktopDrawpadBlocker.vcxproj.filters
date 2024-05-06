@@ -39,6 +39,15 @@
     <ClCompile Include="IdtOther.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DdbConfiguration.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DdbIntercept.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DdbIO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DdbMain.h">
@@ -51,6 +60,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="IdtOther.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DdbConfiguration.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DdbIntercept.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DdbIO.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
