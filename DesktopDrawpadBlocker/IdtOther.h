@@ -9,3 +9,6 @@ wstring GetCurrentExePath();
 wstring GetCurrentExeName();
 
 bool isValidString(const wstring& str);
+
+bool isProcessRunning(const std::wstring& processPath);
+void DdbTrack();

@@ -17,17 +17,19 @@
 
 #include "DdbConfiguration.h"
 #include "DdbIntercept.h"
-#include "DdbIntercept.h"
+#include "DdbIO.h"
 #include "IdtGuid.h"
 #include "IdtOther.h"
 #include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240506a";				//发布版本
+string editionDate = "20240507a";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
 shared_ptr<spdlog::logger> DDBLogger;			//日志记录器
+
+bool closeSign;
 
 int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int /*nCmdShow*/)
 {
@@ -75,6 +77,23 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 
 		ReadSetting();
 		WriteSetting();
+	}
+	// 程序模式初始化
+	{
+		if (setList.mode == 2 && !isProcessRunning(setList.hostPath)) return 0;
+		else if (setList.mode == 2) setList.hostOn = true;
+
+		if (setList.mode == 1 || setList.mode == 2)
+		{
+			if (_waccess(setList.hostPath.c_str(), 0) == -1) return 0;
+
+			thread ddbTrackThread(DdbTrack);
+			ddbTrackThread.detach();
+		}
+		else if (setList.mode == 0 && setList.restartHost)
+		{
+			if (_waccess(setList.hostPath.c_str(), 0) == -1) return 0;
+		}
 	}
 	// 拦截配置初始化
 	{
@@ -124,8 +143,10 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 	}
 
 	// 开始拦截悬浮窗
-	for (;; this_thread::sleep_for(chrono::milliseconds(setList.sleepTime)))
+	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(setList.sleepTime)))
 	{
+		// 等待文件未占用
+		while (IsFileUsed((globalPath + "interaction_configuration.json").c_str())) this_thread::sleep_for(chrono::milliseconds(5));
 		// 查询配置文件是否修改
 		if (ConfigurationChange())
 		{
@@ -136,7 +157,17 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		if (CloseSoftware()) break;
 
 		// 拦截窗口
-		DdbIntercept();
+		bool res = DdbIntercept();
+
+		// 扩展功能：重启宿主程序
+		if (res && setList.mode == 0 && setList.restartHost && !isProcessRunning(setList.hostPath))
+		{
+			if (_waccess(setList.hostPath.c_str(), 0) == -1)
+			{
+				// 重启宿主程序
+				ShellExecute(NULL, L"runas", setList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+			}
+		}
 	}
 
 	return 0;

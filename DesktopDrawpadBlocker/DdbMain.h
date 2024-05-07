@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <iostream>
 #include <filesystem>
+#include <thread>
 #include <chrono>
 
 #include <spdlog/spdlog.h>
@@ -21,3 +22,5 @@ extern string editionDate;
 extern wstring userid;
 extern string globalPath;
 extern shared_ptr<spdlog::logger> DDBLogger;
+
+extern bool closeSign;

@@ -9,8 +9,8 @@ struct SetListStruct
 		sleepTime = 5000;
 
 		mode = 0;
-		hostOn = false;
 		hostPath = L"";
+		hostOn = false, restartHost = true;
 
 		memset(InterceptWindow, true, sizeof(InterceptWindow));
 	}
@@ -19,7 +19,7 @@ struct SetListStruct
 
 	int mode; // 0 独立模式 1 随主程序开启关闭 2 随主程序关闭
 	wstring hostPath;
-	int hostOn;
+	bool hostOn, restartHost; // restartHost：（仅限独立模式）当宿主程序被关闭后，拦截到其他软件的窗口后，重启宿主程序
 
 	bool InterceptWindow[10];
 	/* InterceptWindow 列表：

@@ -11,6 +11,8 @@ SetListStruct setList;
 
 bool ConfigurationChange()
 {
+	if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 4) == -1) return false;
+
 	bool ret = false;
 
 	Json::Reader reader;
@@ -34,6 +36,8 @@ bool ConfigurationChange()
 }
 bool CloseSoftware()
 {
+	if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 4) == -1) return false;
+
 	bool ret = true;
 
 	Json::Reader reader;
@@ -58,6 +62,8 @@ bool CloseSoftware()
 
 bool ReadSetting()
 {
+	if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 4) == -1) return false;
+
 	Json::Reader reader;
 	Json::Value root;
 
@@ -81,6 +87,10 @@ bool ReadSetting()
 			if (root["Mode"].isMember("HostPath") && root["Mode"]["HostPath"].isString())
 			{
 				setList.hostPath = StringToWstring(ConvertToGbk(root["Mode"]["HostPath"].asString()));
+			}
+			if (root["Mode"].isMember("RestartHost") && root["Mode"]["RestartHost"].isBool())
+			{
+				setList.restartHost = root["Mode"]["restartHost"].asBool();
 			}
 		}
 
@@ -121,6 +131,7 @@ bool WriteSetting(bool close)
 
 	root["Mode"]["Mode"] = Json::Value(setList.mode);
 	root["Mode"]["HostPath"] = Json::Value(ConvertToUtf8(WstringToString(setList.hostPath)));
+	root["Mode"]["RestartHost"] = Json::Value(setList.restartHost);
 
 	root["Intercept"]["AiClassFloating"] = Json::Value(setList.InterceptWindow[0]);
 	root["Intercept"]["SeewoWhiteboardFloating"] = Json::Value(setList.InterceptWindow[1]);

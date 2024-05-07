@@ -66,16 +66,21 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 	return TRUE;
 }
 
-void DdbIntercept()
+bool DdbIntercept()
 {
-	EnumWindows(EnumWindowsCallback, 0);
+	bool ret = false;
 
+	EnumWindows(EnumWindowsCallback, 0);
 	for (int i = 0; i < WindowSearchSize; i++)
 	{
 		if (setList.InterceptWindow[i] && WindowSearch[i].foundHwnd)
 		{
+			ret = true;
+
 			PostMessage(WindowSearch[i].outHwnd, WM_CLOSE, 0, 0);
 			WindowSearch[i].foundHwnd = false;
 		}
 	}
+
+	return ret;
 }

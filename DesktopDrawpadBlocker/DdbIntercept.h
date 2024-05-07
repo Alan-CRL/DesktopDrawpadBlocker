@@ -23,4 +23,4 @@ struct WindowSearchStruct
 extern WindowSearchStruct WindowSearch[10];
 extern int WindowSearchSize;
 
-void DdbIntercept();
+bool DdbIntercept();
