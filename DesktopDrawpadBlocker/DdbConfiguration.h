@@ -17,7 +17,7 @@ struct SetListStruct
 
 	int sleepTime;
 
-	int mode; // 0 独立模式 1 随主程序开启关闭 2 随主程序关闭
+	int mode; // 0 独立模式 1 随宿主程序和开启和关闭 2 随宿主程序关闭
 	wstring hostPath;
 	bool hostOn, restartHost; // restartHost：（仅限独立模式）当宿主程序被关闭后，拦截到其他软件的窗口后，重启宿主程序
 

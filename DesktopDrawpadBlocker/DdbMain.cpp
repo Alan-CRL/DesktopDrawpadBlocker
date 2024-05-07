@@ -15,6 +15,7 @@
 
 #include "DdbMain.h"
 
+#include <sstream>
 #include "DdbConfiguration.h"
 #include "DdbIntercept.h"
 #include "DdbIO.h"
@@ -23,7 +24,7 @@
 #include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240507a";				//发布版本
+string editionDate = "20240507b";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
@@ -69,30 +70,59 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 
 	// 配置文件初始化
 	{
-		if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1 || !ConfigurationChange() || CloseSoftware())
+		wstring parameters;
+		wstringstream wss(GetCommandLineW());
+
+		getline(wss, parameters, L'-');
+		getline(wss, parameters, L' ');
+
+		if (parameters == L"startup")
+		{
+			if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1)
+			{
+				WriteSetting(true);
+				return 0;
+			}
+		}
+		else
+		{
+			if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1 || !ConfigurationChange() || CloseSoftware())
+			{
+				WriteSetting(true);
+				return 0;
+			}
+		}
+
+		WriteSetting();
+		ReadSetting();
+	}
+	// 程序模式初始化
+	{
+		if (setList.mode == 2 && !isProcessRunning(setList.hostPath))
 		{
 			WriteSetting(true);
 			return 0;
 		}
-
-		ReadSetting();
-		WriteSetting();
-	}
-	// 程序模式初始化
-	{
-		if (setList.mode == 2 && !isProcessRunning(setList.hostPath)) return 0;
 		else if (setList.mode == 2) setList.hostOn = true;
 
 		if (setList.mode == 1 || setList.mode == 2)
 		{
-			if (_waccess(setList.hostPath.c_str(), 0) == -1) return 0;
+			if (_waccess(setList.hostPath.c_str(), 0) == -1)
+			{
+				WriteSetting(true);
+				return 0;
+			}
 
 			thread ddbTrackThread(DdbTrack);
 			ddbTrackThread.detach();
 		}
 		else if (setList.mode == 0 && setList.restartHost)
 		{
-			if (_waccess(setList.hostPath.c_str(), 0) == -1) return 0;
+			if (_waccess(setList.hostPath.c_str(), 0) == -1)
+			{
+				WriteSetting(true);
+				return 0;
+			}
 		}
 	}
 	// 拦截配置初始化
@@ -145,7 +175,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 	// 开始拦截悬浮窗
 	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(setList.sleepTime)))
 	{
-		// 等待文件未占用
+		// 等待文件占用状态解除
 		while (IsFileUsed((globalPath + "interaction_configuration.json").c_str())) this_thread::sleep_for(chrono::milliseconds(5));
 		// 查询配置文件是否修改
 		if (ConfigurationChange())
@@ -170,5 +200,6 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		}
 	}
 
+	WriteSetting(true);
 	return 0;
 }
