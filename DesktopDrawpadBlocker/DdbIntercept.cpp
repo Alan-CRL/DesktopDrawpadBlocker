@@ -42,14 +42,17 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 			DwmGetWindowAttribute(inquiryHwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
 			int twidth = rect.right - rect.left, thwight = rect.bottom - rect.top;
 
-			HDC hdc = GetDC(NULL);
-			int horizontalDPI = GetDeviceCaps(hdc, LOGPIXELSX);
-			int verticalDPI = GetDeviceCaps(hdc, LOGPIXELSY);
-			ReleaseDC(NULL, hdc);
-			float scale = (horizontalDPI + verticalDPI) / 2.0f / 96.0f;
+			if (WindowSearch[i].width != twidth || WindowSearch[i].height != thwight)
+			{
+				HDC hdc = GetDC(NULL);
+				int horizontalDPI = GetDeviceCaps(hdc, LOGPIXELSX);
+				int verticalDPI = GetDeviceCaps(hdc, LOGPIXELSY);
+				ReleaseDC(NULL, hdc);
+				float scale = (horizontalDPI + verticalDPI) / 2.0f / 96.0f;
 
-			if (abs(WindowSearch[i].width * scale - twidth) > 1 || abs(WindowSearch[i].height * scale - thwight) > 1)
-				continue;
+				if (abs(WindowSearch[i].width * scale - twidth) > 1 || abs(WindowSearch[i].height * scale - thwight) > 1)
+					continue;
+			}
 		}
 
 		WindowSearch[i].outHwnd = inquiryHwnd;
@@ -73,7 +76,7 @@ bool DdbIntercept()
 	EnumWindows(EnumWindowsCallback, 0);
 	for (int i = 0; i < WindowSearchSize; i++)
 	{
-		if (setList.InterceptWindow[i] && WindowSearch[i].foundHwnd)
+		if (ddbSetList.InterceptWindow[i] && WindowSearch[i].foundHwnd)
 		{
 			ret = true;
 

@@ -24,7 +24,7 @@
 #include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240507b";				//发布版本
+string editionDate = "20240509i";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
@@ -76,11 +76,11 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		getline(wss, parameters, L'-');
 		getline(wss, parameters, L' ');
 
-		if (parameters == L"startup")
+		if (parameters == L"startup" || _waccess((StringToWstring(globalPath) + L"start_up.signal").c_str(), 0) == 0)
 		{
 			if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1)
 			{
-				WriteSetting(true);
+				DdbWriteSetting(true);
 				return 0;
 			}
 		}
@@ -88,42 +88,25 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1 || !ConfigurationChange() || CloseSoftware())
 			{
-				WriteSetting(true);
+				DdbWriteSetting(true);
 				return 0;
 			}
 		}
 
-		WriteSetting();
-		ReadSetting();
+		DdbReadSetting();
+		DdbWriteSetting();
 	}
 	// 程序模式初始化
 	{
-		if (setList.mode == 2 && !isProcessRunning(setList.hostPath))
+		if (ddbSetList.mode == 2 && !isProcessRunning(ddbSetList.hostPath))
 		{
-			WriteSetting(true);
+			DdbWriteSetting(true);
 			return 0;
 		}
-		else if (setList.mode == 2) setList.hostOn = true;
+		else if (ddbSetList.mode == 2) ddbSetList.hostOn = true;
 
-		if (setList.mode == 1 || setList.mode == 2)
-		{
-			if (_waccess(setList.hostPath.c_str(), 0) == -1)
-			{
-				WriteSetting(true);
-				return 0;
-			}
-
-			thread ddbTrackThread(DdbTrack);
-			ddbTrackThread.detach();
-		}
-		else if (setList.mode == 0 && setList.restartHost)
-		{
-			if (_waccess(setList.hostPath.c_str(), 0) == -1)
-			{
-				WriteSetting(true);
-				return 0;
-			}
-		}
+		thread ddbTrackThread(DdbTrack);
+		ddbTrackThread.detach();
 	}
 	// 拦截配置初始化
 	{
@@ -173,33 +156,33 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 	}
 
 	// 开始拦截悬浮窗
-	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(setList.sleepTime)))
+	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(ddbSetList.sleepTime)))
 	{
 		// 等待文件占用状态解除
 		while (IsFileUsed((globalPath + "interaction_configuration.json").c_str())) this_thread::sleep_for(chrono::milliseconds(5));
+		// 查询程序是否需要关闭
+		if (CloseSoftware()) break;
 		// 查询配置文件是否修改
 		if (ConfigurationChange())
 		{
-			ReadSetting();
-			WriteSetting();
+			DdbReadSetting();
+			DdbWriteSetting();
 		}
-		// 查询程序是否需要关闭
-		if (CloseSoftware()) break;
 
 		// 拦截窗口
 		bool res = DdbIntercept();
 
 		// 扩展功能：重启宿主程序
-		if (res && setList.mode == 0 && setList.restartHost && !isProcessRunning(setList.hostPath))
+		if (res && ddbSetList.mode == 0 && ddbSetList.restartHost && !isProcessRunning(ddbSetList.hostPath))
 		{
-			if (_waccess(setList.hostPath.c_str(), 0) == -1)
+			if (_waccess(ddbSetList.hostPath.c_str(), 0) == 0)
 			{
 				// 重启宿主程序
-				ShellExecute(NULL, L"runas", setList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+				ShellExecute(NULL, L"runas", ddbSetList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
 			}
 		}
 	}
 
-	WriteSetting(true);
+	DdbWriteSetting(true);
 	return 0;
 }

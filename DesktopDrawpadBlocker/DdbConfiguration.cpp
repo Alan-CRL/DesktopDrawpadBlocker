@@ -7,7 +7,7 @@
 
 #include <fstream>
 
-SetListStruct setList;
+DdbSetListStruct ddbSetList;
 
 bool ConfigurationChange()
 {
@@ -60,7 +60,7 @@ bool CloseSoftware()
 	return ret;
 }
 
-bool ReadSetting()
+bool DdbReadSetting()
 {
 	if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 4) == -1) return false;
 
@@ -75,22 +75,22 @@ bool ReadSetting()
 	{
 		if (root.isMember("SleepTime") && root["SleepTime"].isInt())
 		{
-			setList.sleepTime = root["SleepTime"].asInt();
+			ddbSetList.sleepTime = root["SleepTime"].asInt();
 		}
 
 		if (root.isMember("Mode") && root["Mode"].isObject())
 		{
 			if (root["Mode"].isMember("Mode") && root["Mode"]["Mode"].isInt())
 			{
-				setList.mode = root["Mode"]["Mode"].asInt();
+				ddbSetList.mode = root["Mode"]["Mode"].asInt();
 			}
 			if (root["Mode"].isMember("HostPath") && root["Mode"]["HostPath"].isString())
 			{
-				setList.hostPath = StringToWstring(ConvertToGbk(root["Mode"]["HostPath"].asString()));
+				ddbSetList.hostPath = StringToWstring(ConvertToGbk(root["Mode"]["HostPath"].asString()));
 			}
 			if (root["Mode"].isMember("RestartHost") && root["Mode"]["RestartHost"].isBool())
 			{
-				setList.restartHost = root["Mode"]["restartHost"].asBool();
+				ddbSetList.restartHost = root["Mode"]["RestartHost"].asBool();
 			}
 		}
 
@@ -98,20 +98,20 @@ bool ReadSetting()
 		{
 			if (root["Intercept"].isMember("AiClassFloating") && root["Intercept"]["AiClassFloating"].isBool())
 			{
-				setList.InterceptWindow[0] = root["Intercept"]["AiClassFloating"].asBool();
+				ddbSetList.InterceptWindow[0] = root["Intercept"]["AiClassFloating"].asBool();
 			}
 			if (root["Intercept"].isMember("SeewoWhiteboardFloating") && root["Intercept"]["SeewoWhiteboardFloating"].isBool())
 			{
-				setList.InterceptWindow[1] = root["Intercept"]["SeewoWhiteboardFloating"].asBool();
+				ddbSetList.InterceptWindow[1] = root["Intercept"]["SeewoWhiteboardFloating"].asBool();
 			}
 			if (root["Intercept"].isMember("SeewoPincoFloating") && root["Intercept"]["SeewoPincoFloating"].isBool())
 			{
-				setList.InterceptWindow[2] = setList.InterceptWindow[3] = root["Intercept"]["SeewoPincoFloating"].asBool();
+				ddbSetList.InterceptWindow[2] = ddbSetList.InterceptWindow[3] = root["Intercept"]["SeewoPincoFloating"].asBool();
 			}
 
 			if (root["Intercept"].isMember("SeewoPPTFloating") && root["Intercept"]["SeewoPPTFloating"].isBool())
 			{
-				setList.InterceptWindow[4] = root["Intercept"]["SeewoPPTFloating"].asBool();
+				ddbSetList.InterceptWindow[4] = root["Intercept"]["SeewoPPTFloating"].asBool();
 			}
 		}
 	}
@@ -120,23 +120,23 @@ bool ReadSetting()
 
 	return true;
 }
-bool WriteSetting(bool close)
+bool DdbWriteSetting(bool close)
 {
 	Json::StyledWriter outjson;
 	Json::Value root;
 
 	root["Edition"] = Json::Value(editionDate);
 
-	root["SleepTime"] = Json::Value(setList.sleepTime);
+	root["SleepTime"] = Json::Value(ddbSetList.sleepTime);
 
-	root["Mode"]["Mode"] = Json::Value(setList.mode);
-	root["Mode"]["HostPath"] = Json::Value(ConvertToUtf8(WstringToString(setList.hostPath)));
-	root["Mode"]["RestartHost"] = Json::Value(setList.restartHost);
+	root["Mode"]["Mode"] = Json::Value(ddbSetList.mode);
+	root["Mode"]["HostPath"] = Json::Value(ConvertToUtf8(WstringToString(ddbSetList.hostPath)));
+	root["Mode"]["RestartHost"] = Json::Value(ddbSetList.restartHost);
 
-	root["Intercept"]["AiClassFloating"] = Json::Value(setList.InterceptWindow[0]);
-	root["Intercept"]["SeewoWhiteboardFloating"] = Json::Value(setList.InterceptWindow[1]);
-	root["Intercept"]["SeewoPincoFloating"] = Json::Value(setList.InterceptWindow[2]);
-	root["Intercept"]["SeewoPPTFloating"] = Json::Value(setList.InterceptWindow[4]);
+	root["Intercept"]["AiClassFloating"] = Json::Value(ddbSetList.InterceptWindow[0]);
+	root["Intercept"]["SeewoWhiteboardFloating"] = Json::Value(ddbSetList.InterceptWindow[1]);
+	root["Intercept"]["SeewoPincoFloating"] = Json::Value(ddbSetList.InterceptWindow[2]);
+	root["Intercept"]["SeewoPPTFloating"] = Json::Value(ddbSetList.InterceptWindow[4]);
 
 	root["~ConfigurationChange"] = Json::Value(false);
 	root["~KeepOpen"] = Json::Value(!close);

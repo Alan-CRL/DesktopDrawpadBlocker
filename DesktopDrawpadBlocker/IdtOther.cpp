@@ -78,8 +78,11 @@ void DdbTrack()
 {
 	for (;;)
 	{
-		if (isProcessRunning(setList.hostPath)) setList.hostOn = true;
-		else if (setList.hostOn) closeSign = true;
+		if (ddbSetList.mode != 0)
+		{
+			if (isProcessRunning(ddbSetList.hostPath)) ddbSetList.hostOn = true;
+			else if (ddbSetList.hostOn) closeSign = true;
+		}
 
 		this_thread::sleep_for(chrono::milliseconds(500));
 	}

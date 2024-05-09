@@ -2,9 +2,11 @@
 
 #include "DdbMain.h"
 
-struct SetListStruct
+struct DdbSetListStruct
 {
-	SetListStruct()
+	// Ddb ≈‰÷√Œƒº˛∞Ê±æ 20240509a
+
+	DdbSetListStruct()
 	{
 		sleepTime = 5000;
 
@@ -32,10 +34,10 @@ struct SetListStruct
 	 *
 	 */
 };
-extern SetListStruct setList;
+extern DdbSetListStruct ddbSetList;
 
 bool ConfigurationChange();
 bool CloseSoftware();
 
-bool ReadSetting();
-bool WriteSetting(bool close = false);
+bool DdbReadSetting();
+bool DdbWriteSetting(bool close = false);
