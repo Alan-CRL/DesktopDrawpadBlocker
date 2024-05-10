@@ -24,7 +24,7 @@
 #include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240509i";				//发布版本
+string editionDate = "20240510a";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
