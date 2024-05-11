@@ -24,7 +24,7 @@
 #include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240510a";				//发布版本
+string editionDate = "20240511a";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
@@ -34,6 +34,12 @@ bool closeSign;
 
 int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int /*nCmdShow*/)
 {
+	// 防止重复启动
+	{
+		if (ProcessRunningCnt(GetCurrentExePath()) > 1)
+			return 0;
+	}
+
 	// 路径预处理
 	{
 		globalPath = WstringToString(GetCurrentExeDirectory() + L"\\");

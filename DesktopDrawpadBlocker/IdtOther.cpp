@@ -1,6 +1,7 @@
 #include "IdtOther.h"
 
 #include <tlhelp32.h>
+#include <psapi.h>
 #include "DdbConfiguration.h"
 
 wstring GetCurrentExeDirectory()
@@ -40,7 +41,7 @@ bool isValidString(const wstring& str)
 	return true;
 }
 
-//程序进程状态获取
+// 程序进程状态获取
 bool isProcessRunning(const std::wstring& processPath)
 {
 	PROCESSENTRY32 entry;
@@ -74,6 +75,43 @@ bool isProcessRunning(const std::wstring& processPath)
 	CloseHandle(snapshot);
 	return false;
 }
+// 进程程序路径查询
+int ProcessRunningCnt(const std::wstring& processPath)
+{
+	int ret = 0;
+
+	PROCESSENTRY32 entry;
+	entry.dwSize = sizeof(PROCESSENTRY32);
+	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+
+	if (Process32First(snapshot, &entry))
+	{
+		while (Process32Next(snapshot, &entry))
+		{
+			// 获取进程的完整路径
+			wchar_t processFullPath[MAX_PATH] = L"";
+
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, entry.th32ProcessID);
+			if (hProcess)
+			{
+				HMODULE hMod;
+				DWORD cbNeeded;
+				if (EnumProcessModules(hProcess, &hMod, sizeof(hMod), &cbNeeded))
+				{
+					GetModuleFileNameExW(hProcess, hMod, processFullPath, MAX_PATH);
+				}
+				CloseHandle(hProcess);
+			}
+
+			// 比较路径是否相同
+			if (wcslen(processFullPath) > 0 && wcscmp(processFullPath, processPath.c_str()) == 0) ret++;
+		}
+	}
+
+	CloseHandle(snapshot);
+	return ret;
+}
+
 void DdbTrack()
 {
 	for (;;)
@@ -81,7 +119,7 @@ void DdbTrack()
 		// 检查宿主程序是否存在
 		if (ddbSetList.mode == 1 || (ddbSetList.mode == 0 && ddbSetList.restartHost))
 		{
-			if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1)
+			if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
 				closeSign = true;
 		}
 
