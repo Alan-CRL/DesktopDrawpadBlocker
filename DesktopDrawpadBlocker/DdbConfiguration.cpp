@@ -1,9 +1,7 @@
 #include "DdbConfiguration.h"
 
 #include "IdtText.h"
-#include "JsonCpp/reader.h"
-#include "JsonCpp/value.h"
-#include "JsonCpp/writer.h"
+#include "JsonCpp/json.h"
 
 #include <fstream>
 
@@ -86,7 +84,7 @@ bool DdbReadSetting()
 			}
 			if (root["Mode"].isMember("HostPath") && root["Mode"]["HostPath"].isString())
 			{
-				ddbSetList.hostPath = StringToWstring(ConvertToGbk(root["Mode"]["HostPath"].asString()));
+				ddbSetList.hostPath = StringToWstring(root["Mode"]["HostPath"].asString());
 			}
 			if (root["Mode"].isMember("RestartHost") && root["Mode"]["RestartHost"].isBool())
 			{
@@ -122,7 +120,6 @@ bool DdbReadSetting()
 }
 bool DdbWriteSetting(bool close)
 {
-	Json::StyledWriter outjson;
 	Json::Value root;
 
 	root["Edition"] = Json::Value(editionDate);
@@ -130,7 +127,7 @@ bool DdbWriteSetting(bool close)
 	root["SleepTime"] = Json::Value(ddbSetList.sleepTime);
 
 	root["Mode"]["Mode"] = Json::Value(ddbSetList.mode);
-	root["Mode"]["HostPath"] = Json::Value(ConvertToUtf8(WstringToString(ddbSetList.hostPath)));
+	root["Mode"]["HostPath"] = Json::Value(WstringToString(ddbSetList.hostPath));
 	root["Mode"]["RestartHost"] = Json::Value(ddbSetList.restartHost);
 
 	root["Intercept"]["AiClassFloating"] = Json::Value(ddbSetList.InterceptWindow[0]);
@@ -141,10 +138,13 @@ bool DdbWriteSetting(bool close)
 	root["~ConfigurationChange"] = Json::Value(false);
 	root["~KeepOpen"] = Json::Value(!close);
 
+	Json::StreamWriterBuilder outjson;
+	outjson.settings_["emitUTF8"] = true;
+	std::unique_ptr<Json::StreamWriter> writer(outjson.newStreamWriter());
 	ofstream writejson;
 	writejson.imbue(locale("zh_CN.UTF8"));
 	writejson.open(WstringToString(StringToWstring(globalPath) + L"interaction_configuration.json").c_str());
-	writejson << outjson.write(root);
+	writer->write(root, &writejson);
 	writejson.close();
 
 	return true;

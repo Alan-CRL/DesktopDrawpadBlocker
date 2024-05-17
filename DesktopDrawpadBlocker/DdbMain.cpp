@@ -24,7 +24,7 @@
 #include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240511a";				//发布版本
+string editionDate = "20240514c";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
@@ -184,7 +184,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			if (_waccess(ddbSetList.hostPath.c_str(), 0) == 0)
 			{
 				// 重启宿主程序
-				ShellExecute(NULL, L"runas", ddbSetList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+				ShellExecute(NULL, NULL, ddbSetList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
 			}
 		}
 	}
