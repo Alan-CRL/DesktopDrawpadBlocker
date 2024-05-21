@@ -24,10 +24,13 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 可选的拦截列表：  
 | 名称 | 标识名 |
 |---|---|
-| AiClass 桌面悬浮窗 | `AiClassFloating` |
-| 希沃白板（3/5/5C） 桌面悬浮窗 | `SeewoWhiteboardFloating` |
-| 希沃品课（桌面悬浮窗和PPT控件） | `SeewoPincoFloating` |
+| 希沃白板3 桌面悬浮窗 | `SeewoWhiteboard3Floating` |
+| 希沃白板5 桌面悬浮窗 | `SeewoWhiteboard5Floating` |
+| 希沃白板5C 桌面悬浮窗 | `SeewoWhiteboard5CFloating` |
+| 希沃品课桌面悬浮窗（包括PPT控件） | `SeewoPincoFloating` |
 | 希沃PPT小工具 | `SeewoPPTFloating` |
+| AiClass 桌面悬浮窗 | `AiClassFloating` |
+| 鸿合屏幕书写 | `HiteAnnotationFloating` |
 
 如果有新的拦截需求，请添加 Issues
 

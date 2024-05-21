@@ -24,7 +24,7 @@
 #include "IdtText.h"
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-string editionDate = "20240514c";				//发布版本
+string editionDate = "20240517a";				//发布版本
 
 wstring userid;									//用户ID
 string globalPath;								//程序根路径
@@ -113,22 +113,27 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 
 		thread ddbTrackThread(DdbTrack);
 		ddbTrackThread.detach();
+
+		while (!DdbTrackReady) this_thread::sleep_for(chrono::milliseconds(10));
 	}
 	// 拦截配置初始化
 	{
 		{
-			// AiClass 桌面悬浮窗
-			WindowSearch[0].hasClassName = true;
-			WindowSearch[0].className = L"UIWndTransparent";
+			// 希沃白板3 桌面悬浮窗
 			WindowSearch[0].hasWindowTitle = true;
-			WindowSearch[0].windowTitle = L"TransparentWindow";
+			WindowSearch[0].windowTitle = L"Note";
+			WindowSearch[0].hasClassName = true;
+			WindowSearch[0].className = L"HwndWrapper[EasiNote.exe;;";
 			WindowSearch[0].hasStyle = true;
-			WindowSearch[0].style = -2080374784;
+			WindowSearch[0].style = 370081792;
+			WindowSearch[0].hasWidthHeight = true;
+			WindowSearch[0].width = GetSystemMetrics(SM_CXSCREEN);
+			WindowSearch[0].height = GetSystemMetrics(SM_CYSCREEN);
 		}
 		{
-			// 希沃白板 桌面悬浮窗
+			// 希沃白板5 桌面悬浮窗
 			WindowSearch[1].hasClassName = true;
-			WindowSearch[1].className = L"HwndWrapper[EasiNote";
+			WindowSearch[1].className = L"HwndWrapper[EasiNote;;";
 			WindowSearch[1].hasStyle = true;
 			WindowSearch[1].style = 369623040;
 			WindowSearch[1].hasWidthHeight = true;
@@ -136,29 +141,60 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[1].height = 200;
 		}
 		{
-			// 希沃品课（桌面悬浮窗和PPT控件）
+			// 希沃白板5C 桌面悬浮窗
 			WindowSearch[2].hasClassName = true;
-			WindowSearch[2].className = L"Chrome_WidgetWin_1";
-			WindowSearch[2].hasWindowTitle = true;
-			WindowSearch[2].windowTitle = L"希沃品课——integration";
+			WindowSearch[2].className = L"HwndWrapper[EasiNote5C;;";
 			WindowSearch[2].hasStyle = true;
-			WindowSearch[2].style = 335675392;
+			WindowSearch[2].style = 369623040;
+			WindowSearch[2].hasWidthHeight = true;
+			WindowSearch[2].width = 550;
+			WindowSearch[2].height = 200;
 		}
 		{
-			// 希沃品课 桌面画板
+			// 希沃品课桌面悬浮窗（包括PPT控件）
 			WindowSearch[3].hasClassName = true;
-			WindowSearch[3].className = L"HwndWrapper[BoardService;;";
+			WindowSearch[3].className = L"Chrome_WidgetWin_1";
+			WindowSearch[3].hasWindowTitle = true;
+			WindowSearch[3].windowTitle = L"希沃品课——integration";
 			WindowSearch[3].hasStyle = true;
-			WindowSearch[3].style = 369623040;
+			WindowSearch[3].style = 335675392;
+		}
+		{
+			// 希沃品课桌面画板（附加）
+			WindowSearch[4].hasClassName = true;
+			WindowSearch[4].className = L"HwndWrapper[BoardService;;";
+			WindowSearch[4].hasStyle = true;
+			WindowSearch[4].style = 369623040;
+			WindowSearch[4].hasWidthHeight = true;
+			WindowSearch[4].width = GetSystemMetrics(SM_CXSCREEN);
+			WindowSearch[4].height = GetSystemMetrics(SM_CYSCREEN);
 		}
 		{
 			// 希沃PPT小工具
-			WindowSearch[4].hasClassName = true;
-			WindowSearch[4].className = L"HwndWrapper[PPTService.exe;;";
-			WindowSearch[4].hasStyle = true;
-			WindowSearch[4].style = 369623040;
+			WindowSearch[5].hasClassName = true;
+			WindowSearch[5].className = L"HwndWrapper[PPTService.exe;;";
+			WindowSearch[5].hasStyle = true;
+			WindowSearch[5].style = 369623040;
 		}
-		WindowSearchSize = 5;
+		{
+			// AiClass 桌面悬浮窗
+			WindowSearch[6].hasClassName = true;
+			WindowSearch[6].className = L"UIWndTransparent";
+			WindowSearch[6].hasWindowTitle = true;
+			WindowSearch[6].windowTitle = L"TransparentWindow";
+			WindowSearch[6].hasStyle = true;
+			WindowSearch[6].style = -2080374784;
+		}
+		{
+			// 鸿合屏幕书写
+			WindowSearch[7].hasWindowTitle = true;
+			WindowSearch[7].windowTitle = L"HiteAnnotation";
+			WindowSearch[7].hasClassName = true;
+			WindowSearch[7].className = L"Qt5QWindowToolSaveBits";
+			WindowSearch[7].hasStyle = true;
+			WindowSearch[7].style = -1778384896;
+		}
+		WindowSearchSize = 8;
 	}
 
 	// 开始拦截悬浮窗
@@ -181,7 +217,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		// 扩展功能：重启宿主程序
 		if (res && ddbSetList.mode == 0 && ddbSetList.restartHost && !isProcessRunning(ddbSetList.hostPath))
 		{
-			if (_waccess(ddbSetList.hostPath.c_str(), 0) == 0)
+			if (ddbSetList.hostPath != L"CommissioningTest" && _waccess(ddbSetList.hostPath.c_str(), 0) == 0)
 			{
 				// 重启宿主程序
 				ShellExecute(NULL, NULL, ddbSetList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);

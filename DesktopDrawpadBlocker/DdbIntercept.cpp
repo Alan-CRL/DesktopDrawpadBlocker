@@ -18,16 +18,16 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 	{
 		if (WindowSearch[i].hasClassName)
 		{
-			TCHAR classNameBuffer[1024];
-			GetClassName(inquiryHwnd, classNameBuffer, 1024);
-			if (_tcsstr(classNameBuffer, WindowSearch[i].className.c_str()) == NULL)
+			unique_ptr<TCHAR[]> classNameBuffer(new TCHAR[1024]);
+			GetClassName(inquiryHwnd, classNameBuffer.get(), 1024);
+			if (_tcsstr(classNameBuffer.get(), WindowSearch[i].className.c_str()) == NULL)
 				continue;
 		}
 		if (WindowSearch[i].hasWindowTitle)
 		{
-			TCHAR windowTitleBuffer[1024];
-			GetWindowText(inquiryHwnd, windowTitleBuffer, 1024);
-			if (_tcsstr(windowTitleBuffer, WindowSearch[i].windowTitle.c_str()) == NULL)
+			unique_ptr<TCHAR[]> windowTitleBuffer(new TCHAR[1024]);
+			GetWindowText(inquiryHwnd, windowTitleBuffer.get(), 1024);
+			if (_tcsstr(windowTitleBuffer.get(), WindowSearch[i].windowTitle.c_str()) == NULL)
 				continue;
 		}
 

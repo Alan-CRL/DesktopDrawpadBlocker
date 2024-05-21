@@ -112,8 +112,23 @@ int ProcessRunningCnt(const std::wstring& processPath)
 	return ret;
 }
 
+bool DdbTrackReady;
 void DdbTrack()
 {
+	// 检查宿主程序是否存在
+	if (ddbSetList.mode == 1 || (ddbSetList.mode == 0 && ddbSetList.restartHost))
+	{
+		if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
+			closeSign = true;
+	}
+	// 检查宿主程序是否在运行
+	if (ddbSetList.mode != 0)
+	{
+		if (isProcessRunning(ddbSetList.hostPath)) ddbSetList.hostOn = true;
+		else if (ddbSetList.hostOn) closeSign = true;
+	}
+	DdbTrackReady = true;
+
 	for (;;)
 	{
 		// 检查宿主程序是否存在
@@ -122,7 +137,6 @@ void DdbTrack()
 			if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
 				closeSign = true;
 		}
-
 		// 检查宿主程序是否在运行
 		if (ddbSetList.mode != 0)
 		{

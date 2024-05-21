@@ -13,4 +13,5 @@ bool isValidString(const wstring& str);
 bool isProcessRunning(const std::wstring& processPath);
 int ProcessRunningCnt(const std::wstring& processPath);
 
+extern bool DdbTrackReady;
 void DdbTrack();
