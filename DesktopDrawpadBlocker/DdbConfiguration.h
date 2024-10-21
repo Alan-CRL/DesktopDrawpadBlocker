@@ -4,7 +4,7 @@
 
 struct DdbSetListStruct
 {
-	// Ddb 配置文件版本 20240509a
+	// Ddb 配置文件版本 20241021a
 
 	DdbSetListStruct()
 	{
@@ -26,6 +26,8 @@ struct DdbSetListStruct
 	bool InterceptWindow[10];
 };
 extern DdbSetListStruct ddbSetList;
+
+extern bool usingBom;
 
 bool ConfigurationChange(HANDLE* hFile);
 bool CloseSoftware(HANDLE* hFile);

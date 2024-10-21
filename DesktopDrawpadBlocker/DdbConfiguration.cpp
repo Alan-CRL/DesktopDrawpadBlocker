@@ -6,6 +6,7 @@
 #include <fstream>
 
 DdbSetListStruct ddbSetList;
+bool usingBom = false;
 
 bool ConfigurationChange(HANDLE* hFile)
 {
@@ -20,7 +21,7 @@ bool ConfigurationChange(HANDLE* hFile)
 	DWORD bytesRead = 0;
 	if (SetFilePointer(*hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return ret;
 	if (!ReadFile(*hFile, &jsonContent[0], dwSize, &bytesRead, NULL) || bytesRead != dwSize) return ret;
-	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3);
+	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3), usingBom = true;
 
 	istringstream jsonContentStream(jsonContent);
 	Json::CharReaderBuilder readerBuilder;
@@ -50,7 +51,7 @@ bool CloseSoftware(HANDLE* hFile)
 	DWORD bytesRead = 0;
 	if (SetFilePointer(*hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return ret;
 	if (!ReadFile(*hFile, &jsonContent[0], dwSize, &bytesRead, NULL) || bytesRead != dwSize) return ret;
-	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3);
+	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3), usingBom = true;
 
 	istringstream jsonContentStream(jsonContent);
 	Json::CharReaderBuilder readerBuilder;
@@ -79,7 +80,7 @@ bool DdbReadSetting(HANDLE* hFile)
 	DWORD bytesRead = 0;
 	if (SetFilePointer(*hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return false;
 	if (!ReadFile(*hFile, &jsonContent[0], dwSize, &bytesRead, NULL) || bytesRead != dwSize) return false;
-	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3);
+	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3), usingBom = true;
 
 	istringstream jsonContentStream(jsonContent);
 	Json::CharReaderBuilder readerBuilder;
@@ -171,7 +172,8 @@ bool DdbWriteSetting(HANDLE* hFile, bool close)
 	if (!SetEndOfFile(hFile)) return false;
 
 	Json::StreamWriterBuilder writerBuilder;
-	string jsonContent = "\xEF\xBB\xBF" + Json::writeString(writerBuilder, updateVal);
+	string jsonContent = Json::writeString(writerBuilder, updateVal);
+	if (usingBom) jsonContent = "\xEF\xBB\xBF" + jsonContent;
 
 	DWORD bytesWritten = 0;
 	if (!WriteFile(hFile, jsonContent.data(), static_cast<DWORD>(jsonContent.size()), &bytesWritten, NULL) || bytesWritten != jsonContent.size()) return false;
