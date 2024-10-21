@@ -47,9 +47,9 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 [bool] `~KeepOpen`：决定程序是否需要开启  
 > 启动程序时此项因为 true（开启自启时除外），当程序关闭后此项将变为 false
 
-[int64] `SleepTime`：每次扫描窗口的间隔（单位 ms）  
+[int32] `SleepTime`：每次扫描窗口的间隔（单位 ms）  
 
-[int64] `Mode` `Mode`：程序模式（0 独立模式 1 随宿主程序和开启和关闭 2 随宿主程序关闭）  
+[int32] `Mode` `Mode`：程序模式（0 独立模式 1 随宿主程序和开启和关闭 2 随宿主程序关闭）  
 [bool] `Mode` `RestartHost`：（模式为 0 时 **必须**）启用上述拓展功能  
 [utf8 string] `Mode` `HostPath`：（utf8，模式不为 0 或 开启拓展功能时 **必须**）宿主程序路径  
 

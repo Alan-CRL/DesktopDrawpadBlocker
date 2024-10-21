@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 #include "DdbMain.h"
 
 struct DdbSetListStruct
 {
-	// Ddb ÅäÖÃÎÄ¼ş°æ±¾ 20240509a
+	// Ddb é…ç½®æ–‡ä»¶ç‰ˆæœ¬ 20240509a
 
 	DdbSetListStruct()
 	{
@@ -19,16 +19,16 @@ struct DdbSetListStruct
 
 	int sleepTime;
 
-	int mode; // 0 ¶ÀÁ¢Ä£Ê½ 1 ËæËŞÖ÷³ÌĞòºÍ¿ªÆôºÍ¹Ø±Õ 2 ËæËŞÖ÷³ÌĞò¹Ø±Õ
+	int mode; // 0 ç‹¬ç«‹æ¨¡å¼ 1 éšå®¿ä¸»ç¨‹åºå’Œå¼€å¯å’Œå…³é—­ 2 éšå®¿ä¸»ç¨‹åºå…³é—­
 	wstring hostPath;
-	bool hostOn, restartHost; // restartHost£º£¨½öÏŞ¶ÀÁ¢Ä£Ê½£©µ±ËŞÖ÷³ÌĞò±»¹Ø±Õºó£¬À¹½Øµ½ÆäËûÈí¼şµÄ´°¿Úºó£¬ÖØÆôËŞÖ÷³ÌĞò
+	bool hostOn, restartHost; // restartHostï¼šï¼ˆä»…é™ç‹¬ç«‹æ¨¡å¼ï¼‰å½“å®¿ä¸»ç¨‹åºè¢«å…³é—­åï¼Œæ‹¦æˆªåˆ°å…¶ä»–è½¯ä»¶çš„çª—å£åï¼Œé‡å¯å®¿ä¸»ç¨‹åº
 
 	bool InterceptWindow[10];
 };
 extern DdbSetListStruct ddbSetList;
 
-bool ConfigurationChange();
-bool CloseSoftware();
+bool ConfigurationChange(HANDLE* hFile);
+bool CloseSoftware(HANDLE* hFile);
 
-bool DdbReadSetting();
-bool DdbWriteSetting(bool close = false);
+bool DdbReadSetting(HANDLE* hFile);
+bool DdbWriteSetting(HANDLE* hFile, bool close = false);

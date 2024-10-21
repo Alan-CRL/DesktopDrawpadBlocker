@@ -45,9 +45,6 @@
     <ClCompile Include="DdbIntercept.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DdbIO.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DdbMain.h">
@@ -66,9 +63,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DdbIntercept.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DdbIO.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

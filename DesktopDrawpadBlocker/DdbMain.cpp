@@ -1,7 +1,7 @@
-/*
+ï»¿/*
  * @file		DdbMain.cpp
- * @brief		DesktopDrawpadBlocker ÏîÄ¿ÖĞĞÄÔ´ÎÄ¼ş
- * @note		ÓÃÓÚ³õÊ¼»¯ DesktopDrawpadBlocker ²¢µ÷ÓÃÏà¹ØÄ£¿é
+ * @brief		DesktopDrawpadBlocker é¡¹ç›®ä¸­å¿ƒæºæ–‡ä»¶
+ * @note		ç”¨äºåˆå§‹åŒ– DesktopDrawpadBlocker å¹¶è°ƒç”¨ç›¸å…³æ¨¡å—
  *
  * @envir		VisualStudio 2022 | MSVC 143
  * @site		https://github.com/Alan-CRL/DesktopDrawpadBlocker
@@ -10,7 +10,7 @@
  * @qq			2685549821
  * @email		alan-crl@foxmail.com
  *
- * @description ÏîÄ¿ÎÄ¼şÖĞ Ddb ¿ªÍ·Îª±¾ÏîÄ¿ÎÄ¼ş£¬Idt ¿ªÍ·Îª ÖÇ»æ½ÌInkeys ÏîÄ¿ÒıÓÃ£¨https://github.com/Alan-CRL/Intelligent-Drawing-Teaching£©
+ * @description é¡¹ç›®æ–‡ä»¶ä¸­ Ddb å¼€å¤´ä¸ºæœ¬é¡¹ç›®æ–‡ä»¶ï¼ŒIdt å¼€å¤´ä¸º æ™ºç»˜æ•™Inkeys é¡¹ç›®å¼•ç”¨ï¼ˆhttps://github.com/Alan-CRL/Inkeysï¼‰
 */
 
 #include "DdbMain.h"
@@ -18,63 +18,62 @@
 #include <sstream>
 #include "DdbConfiguration.h"
 #include "DdbIntercept.h"
-#include "DdbIO.h"
 #include "IdtGuid.h"
 #include "IdtOther.h"
 #include "IdtText.h"
 
-wstring buildTime = __DATE__ L" " __TIME__;		//¹¹½¨Ê±¼ä
-string editionDate = "20240517a";				//·¢²¼°æ±¾
+#include <fstream>
 
-wstring userid;									//ÓÃ»§ID
-string globalPath;								//³ÌĞò¸ùÂ·¾¶
-shared_ptr<spdlog::logger> DDBLogger;			//ÈÕÖ¾¼ÇÂ¼Æ÷
+wstring buildTime = __DATE__ L" " __TIME__;		//æ„å»ºæ—¶é—´
+wstring editionDate = L"20241021a";				//å‘å¸ƒç‰ˆæœ¬
+
+wstring userid;									//ç”¨æˆ·ID
+wstring globalPath;								//ç¨‹åºæ ¹è·¯å¾„
+
+#ifndef DDB_RELEASE
+void Test()
+{
+	MessageBoxW(NULL, L"æ ‡è®°å¤„", L"æ ‡è®°", MB_OK | MB_SYSTEMMODAL);
+}
+void Testb(bool t)
+{
+	MessageBoxW(NULL, t ? L"true" : L"false", L"çœŸå¦æ ‡è®°", MB_OK | MB_SYSTEMMODAL);
+}
+void Testi(long long t)
+{
+	MessageBoxW(NULL, to_wstring(t).c_str(), L"æ•°å€¼æ ‡è®°", MB_OK | MB_SYSTEMMODAL);
+}
+void Testw(wstring t)
+{
+	MessageBoxW(NULL, t.c_str(), L"å­—ç¬¦æ ‡è®°", MB_OK | MB_SYSTEMMODAL);
+}
+void Testa(string t)
+{
+	MessageBoxW(NULL, utf8ToUtf16(t).c_str(), L"å­—ç¬¦æ ‡è®°", MB_OK | MB_SYSTEMMODAL);
+}
+#endif
 
 bool closeSign;
+int occSErrorT = 0;
 
 int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int /*nCmdShow*/)
 {
-	// ·ÀÖ¹ÖØ¸´Æô¶¯
+	// é˜²æ­¢é‡å¤å¯åŠ¨
 	{
-		if (ProcessRunningCnt(GetCurrentExePath()) > 1)
-			return 0;
+		if (ProcessRunningCnt(GetCurrentExePath()) > 1) return 0;
 	}
 
-	// Â·¾¶Ô¤´¦Àí
+	// è·¯å¾„é¢„å¤„ç†
 	{
-		globalPath = WstringToString(GetCurrentExeDirectory() + L"\\");
+		globalPath = (GetCurrentExeDirectory() + L"\\");
 	}
-	// ÓÃ»§ID»ñÈ¡
+	// ç”¨æˆ·IDè·å–
 	{
-		userid = StringToWstring(getDeviceGUID());
+		userid = utf8ToUtf16(getDeviceGUID());
 		if (userid.empty() || !isValidString(userid)) userid = L"IDError";
 	}
-	// ÈÕÖ¾·şÎñ³õÊ¼»¯
-	{
-		error_code ec;
-		if (_waccess((StringToWstring(globalPath) + L"log").c_str(), 0) == -1) filesystem::create_directory(StringToWstring(globalPath) + L"log", ec);
-		else if (_waccess((StringToWstring(globalPath) + L"log\\Ddb.log").c_str(), 0) == 0) filesystem::remove(StringToWstring(globalPath) + L"log\\Ddb.log", ec);
 
-		auto DDBLoggerFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(globalPath + "log\\Ddb.log");
-
-		spdlog::init_thread_pool(8192, 64);
-		DDBLogger = std::make_shared<spdlog::async_logger>("DDBLogger", DDBLoggerFileSink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-
-		DDBLogger->set_level(spdlog::level::info);
-		DDBLogger->set_pattern("[%l][%H:%M:%S.%e]%v");
-
-		DDBLogger->flush_on(spdlog::level::info);
-		DDBLogger->info("[Ö÷Ïß³Ì][DdbMain] ÈÕÖ¾¿ªÊ¼¼ÇÂ¼");
-		DDBLogger->info("[Ö÷Ïß³Ì][DdbMain] DDB°æ±¾ " + editionDate);
-		DDBLogger->info("[Ö÷Ïß³Ì][DdbMain] ÓÃ»§ID " + WstringToString(userid));
-
-		//logger->info("");
-		//logger->warn("");
-		//logger->error("");
-		//logger->critical("");
-	}
-
-	// ÅäÖÃÎÄ¼ş³õÊ¼»¯
+	// é…ç½®æ–‡ä»¶åˆå§‹åŒ–
 	{
 		wstring parameters;
 		wstringstream wss(GetCommandLineW());
@@ -82,31 +81,52 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		getline(wss, parameters, L'-');
 		getline(wss, parameters, L' ');
 
-		if (parameters == L"startup" || _waccess((StringToWstring(globalPath) + L"start_up.signal").c_str(), 0) == 0)
+		if (parameters == L"startup" || _waccess((globalPath + L"start_up.signal").c_str(), 0) == 0)
 		{
-			if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1)
+			if (_waccess((globalPath + L"interaction_configuration.json").c_str(), 0) == -1)
 			{
-				DdbWriteSetting(true);
+				HANDLE fileHandle = NULL;
+				if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) DdbWriteSetting(&fileHandle, true);
+				UnOccupyFile(&fileHandle);
+
 				return 0;
 			}
 		}
 		else
 		{
-			if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 0) == -1 || !ConfigurationChange() || CloseSoftware())
+			bool flg = true;
+
+			HANDLE fileHandle = NULL;
+			if (flg && !OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) flg = false;
+			if (flg && !ConfigurationChange(&fileHandle)) flg = false;
+			if (flg && CloseSoftware(&fileHandle)) flg = false;
+
+			if (!flg)
 			{
-				DdbWriteSetting(true);
+				DdbWriteSetting(&fileHandle, true);
+				UnOccupyFile(&fileHandle);
+
 				return 0;
 			}
+			UnOccupyFile(&fileHandle);
 		}
 
-		DdbReadSetting();
-		DdbWriteSetting();
+		HANDLE fileHandle = NULL;
+		if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json"))
+		{
+			DdbReadSetting(&fileHandle);
+			DdbWriteSetting(&fileHandle);
+		}
+		UnOccupyFile(&fileHandle);
 	}
-	// ³ÌĞòÄ£Ê½³õÊ¼»¯
+	// ç¨‹åºæ¨¡å¼åˆå§‹åŒ–
 	{
 		if (ddbSetList.mode == 2 && !isProcessRunning(ddbSetList.hostPath))
 		{
-			DdbWriteSetting(true);
+			HANDLE fileHandle = NULL;
+			if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) DdbWriteSetting(&fileHandle, true);
+			UnOccupyFile(&fileHandle);
+
 			return 0;
 		}
 		else if (ddbSetList.mode == 2) ddbSetList.hostOn = true;
@@ -116,10 +136,10 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 
 		while (!DdbTrackReady) this_thread::sleep_for(chrono::milliseconds(10));
 	}
-	// À¹½ØÅäÖÃ³õÊ¼»¯
+	// æ‹¦æˆªé…ç½®åˆå§‹åŒ–
 	{
 		{
-			// Ï£ÎÖ°×°å3 ×ÀÃæĞü¸¡´°
+			// å¸Œæ²ƒç™½æ¿3 æ¡Œé¢æ‚¬æµ®çª—
 			WindowSearch[0].hasWindowTitle = true;
 			WindowSearch[0].windowTitle = L"Note";
 			WindowSearch[0].hasClassName = true;
@@ -131,7 +151,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[0].height = GetSystemMetrics(SM_CYSCREEN);
 		}
 		{
-			// Ï£ÎÖ°×°å5 ×ÀÃæĞü¸¡´°
+			// å¸Œæ²ƒç™½æ¿5 æ¡Œé¢æ‚¬æµ®çª—
 			WindowSearch[1].hasClassName = true;
 			WindowSearch[1].className = L"HwndWrapper[EasiNote;;";
 			WindowSearch[1].hasStyle = true;
@@ -141,7 +161,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[1].height = 200;
 		}
 		{
-			// Ï£ÎÖ°×°å5C ×ÀÃæĞü¸¡´°
+			// å¸Œæ²ƒç™½æ¿5C æ¡Œé¢æ‚¬æµ®çª—
 			WindowSearch[2].hasClassName = true;
 			WindowSearch[2].className = L"HwndWrapper[EasiNote5C;;";
 			WindowSearch[2].hasStyle = true;
@@ -151,16 +171,16 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[2].height = 200;
 		}
 		{
-			// Ï£ÎÖÆ·¿Î×ÀÃæĞü¸¡´°£¨°üÀ¨PPT¿Ø¼ş£©
+			// å¸Œæ²ƒå“è¯¾æ¡Œé¢æ‚¬æµ®çª—ï¼ˆåŒ…æ‹¬PPTæ§ä»¶ï¼‰
 			WindowSearch[3].hasClassName = true;
 			WindowSearch[3].className = L"Chrome_WidgetWin_1";
 			WindowSearch[3].hasWindowTitle = true;
-			WindowSearch[3].windowTitle = L"Ï£ÎÖÆ·¿Î¡ª¡ªintegration";
+			WindowSearch[3].windowTitle = L"å¸Œæ²ƒå“è¯¾â€”â€”integration";
 			WindowSearch[3].hasStyle = true;
 			WindowSearch[3].style = 335675392;
 		}
 		{
-			// Ï£ÎÖÆ·¿Î×ÀÃæ»­°å£¨¸½¼Ó£©
+			// å¸Œæ²ƒå“è¯¾æ¡Œé¢ç”»æ¿ï¼ˆé™„åŠ ï¼‰
 			WindowSearch[4].hasClassName = true;
 			WindowSearch[4].className = L"HwndWrapper[BoardService;;";
 			WindowSearch[4].hasStyle = true;
@@ -170,14 +190,14 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[4].height = GetSystemMetrics(SM_CYSCREEN);
 		}
 		{
-			// Ï£ÎÖPPTĞ¡¹¤¾ß
+			// å¸Œæ²ƒPPTå°å·¥å…·
 			WindowSearch[5].hasClassName = true;
 			WindowSearch[5].className = L"HwndWrapper[PPTService.exe;;";
 			WindowSearch[5].hasStyle = true;
 			WindowSearch[5].style = 369623040;
 		}
 		{
-			// AiClass ×ÀÃæĞü¸¡´°
+			// AiClass æ¡Œé¢æ‚¬æµ®çª—
 			WindowSearch[6].hasClassName = true;
 			WindowSearch[6].className = L"UIWndTransparent";
 			WindowSearch[6].hasWindowTitle = true;
@@ -186,7 +206,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[6].style = -2080374784;
 		}
 		{
-			// ºèºÏÆÁÄ»ÊéĞ´
+			// é¸¿åˆå±å¹•ä¹¦å†™
 			WindowSearch[7].hasWindowTitle = true;
 			WindowSearch[7].windowTitle = L"HiteAnnotation";
 			WindowSearch[7].hasClassName = true;
@@ -197,34 +217,56 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		WindowSearchSize = 8;
 	}
 
-	// ¿ªÊ¼À¹½ØĞü¸¡´°
+	// å¼€å§‹æ‹¦æˆªæ‚¬æµ®çª—
 	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(ddbSetList.sleepTime)))
 	{
-		// µÈ´ıÎÄ¼şÕ¼ÓÃ×´Ì¬½â³ı
-		while (IsFileUsed((globalPath + "interaction_configuration.json").c_str())) this_thread::sleep_for(chrono::milliseconds(5));
-		// ²éÑ¯³ÌĞòÊÇ·ñĞèÒª¹Ø±Õ
-		if (CloseSoftware()) break;
-		// ²éÑ¯ÅäÖÃÎÄ¼şÊÇ·ñĞŞ¸Ä
-		if (ConfigurationChange())
+		// å ç”¨æ–‡ä»¶è¯»å†™æƒé™
+		HANDLE fileHandle = NULL;
 		{
-			DdbReadSetting();
-			DdbWriteSetting();
+			bool occS = OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json");
+			if (!occS)
+			{
+				occSErrorT++;
+				UnOccupyFile(&fileHandle);
+				continue;
+			}
+			else occSErrorT = 0;
 		}
 
-		// À¹½Ø´°¿Ú
+		// æŸ¥è¯¢ç¨‹åºæ˜¯å¦éœ€è¦å…³é—­
+		if (CloseSoftware(&fileHandle))
+		{
+			UnOccupyFile(&fileHandle);
+			break;
+		}
+
+		// æŸ¥è¯¢é…ç½®æ–‡ä»¶æ˜¯å¦ä¿®æ”¹
+		if (ConfigurationChange(&fileHandle))
+		{
+			DdbReadSetting(&fileHandle);
+			DdbWriteSetting(&fileHandle);
+		}
+
+		// è§£é™¤æ–‡ä»¶è¯»å†™æƒé™
+		UnOccupyFile(&fileHandle);
+
+		// æ‹¦æˆªçª—å£
 		bool res = DdbIntercept();
 
-		// À©Õ¹¹¦ÄÜ£ºÖØÆôËŞÖ÷³ÌĞò
+		// æ‰©å±•åŠŸèƒ½ï¼šé‡å¯å®¿ä¸»ç¨‹åº
 		if (res && ddbSetList.mode == 0 && ddbSetList.restartHost && !isProcessRunning(ddbSetList.hostPath))
 		{
 			if (ddbSetList.hostPath != L"CommissioningTest" && _waccess(ddbSetList.hostPath.c_str(), 0) == 0)
 			{
-				// ÖØÆôËŞÖ÷³ÌĞò
-				ShellExecute(NULL, NULL, ddbSetList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+				// é‡å¯å®¿ä¸»ç¨‹åº
+				ShellExecuteW(NULL, NULL, ddbSetList.hostPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
 			}
 		}
 	}
 
-	DdbWriteSetting(true);
+	HANDLE fileHandle = NULL;
+	if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) DdbWriteSetting(&fileHandle, true);
+	UnOccupyFile(&fileHandle);
+
 	return 0;
 }

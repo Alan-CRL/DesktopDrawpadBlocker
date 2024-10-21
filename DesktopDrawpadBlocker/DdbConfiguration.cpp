@@ -1,4 +1,4 @@
-#include "DdbConfiguration.h"
+﻿#include "DdbConfiguration.h"
 
 #include "IdtText.h"
 #include "JsonCpp/json.h"
@@ -7,159 +7,173 @@
 
 DdbSetListStruct ddbSetList;
 
-bool ConfigurationChange()
+bool ConfigurationChange(HANDLE* hFile)
 {
-	if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 4) == -1) return false;
-
 	bool ret = false;
 
-	Json::Reader reader;
-	Json::Value root;
+	LARGE_INTEGER fileSize;
+	if (!GetFileSizeEx(*hFile, &fileSize)) return ret;
 
-	ifstream readjson;
-	readjson.imbue(locale("zh_CN.UTF8"));
-	readjson.open(WstringToString(StringToWstring(globalPath) + L"interaction_configuration.json").c_str());
+	DWORD dwSize = static_cast<DWORD>(fileSize.QuadPart);
+	string jsonContent(dwSize, '\0');
 
-	if (reader.parse(readjson, root))
+	DWORD bytesRead = 0;
+	if (SetFilePointer(*hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return ret;
+	if (!ReadFile(*hFile, &jsonContent[0], dwSize, &bytesRead, NULL) || bytesRead != dwSize) return ret;
+	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3);
+
+	istringstream jsonContentStream(jsonContent);
+	Json::CharReaderBuilder readerBuilder;
+	Json::Value updateVal;
+	string jsonErr;
+
+	if (Json::parseFromStream(readerBuilder, jsonContentStream, &updateVal, &jsonErr))
 	{
-		if (root.isMember("~ConfigurationChange") && root["~ConfigurationChange"].isBool())
+		if (updateVal.isMember("~ConfigurationChange") && updateVal["~ConfigurationChange"].isBool())
 		{
-			ret = root["~ConfigurationChange"].asBool();
+			ret = updateVal["~ConfigurationChange"].asBool();
 		}
 	}
 
-	readjson.close();
-
 	return ret;
 }
-bool CloseSoftware()
+bool CloseSoftware(HANDLE* hFile)
 {
-	if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 4) == -1) return false;
-
 	bool ret = true;
 
-	Json::Reader reader;
-	Json::Value root;
+	LARGE_INTEGER fileSize;
+	if (!GetFileSizeEx(*hFile, &fileSize)) return ret;
 
-	ifstream readjson;
-	readjson.imbue(locale("zh_CN.UTF8"));
-	readjson.open(WstringToString(StringToWstring(globalPath) + L"interaction_configuration.json").c_str());
+	DWORD dwSize = static_cast<DWORD>(fileSize.QuadPart);
+	string jsonContent(dwSize, '\0');
 
-	if (reader.parse(readjson, root))
+	DWORD bytesRead = 0;
+	if (SetFilePointer(*hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return ret;
+	if (!ReadFile(*hFile, &jsonContent[0], dwSize, &bytesRead, NULL) || bytesRead != dwSize) return ret;
+	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3);
+
+	istringstream jsonContentStream(jsonContent);
+	Json::CharReaderBuilder readerBuilder;
+	Json::Value updateVal;
+	string jsonErr;
+
+	if (Json::parseFromStream(readerBuilder, jsonContentStream, &updateVal, &jsonErr))
 	{
-		if (root.isMember("~KeepOpen") && root["~KeepOpen"].isBool())
+		if (updateVal.isMember("~KeepOpen") && updateVal["~KeepOpen"].isBool())
 		{
-			ret = !root["~KeepOpen"].asBool();
+			ret = !updateVal["~KeepOpen"].asBool();
 		}
 	}
-
-	readjson.close();
 
 	return ret;
 }
 
-bool DdbReadSetting()
+bool DdbReadSetting(HANDLE* hFile)
 {
-	if (_waccess((StringToWstring(globalPath) + L"interaction_configuration.json").c_str(), 4) == -1) return false;
+	LARGE_INTEGER fileSize;
+	if (!GetFileSizeEx(*hFile, &fileSize)) return false;
 
-	Json::Reader reader;
-	Json::Value root;
+	DWORD dwSize = static_cast<DWORD>(fileSize.QuadPart);
+	string jsonContent(dwSize, '\0');
 
-	ifstream readjson;
-	readjson.imbue(locale("zh_CN.UTF8"));
-	readjson.open(WstringToString(StringToWstring(globalPath) + L"interaction_configuration.json").c_str());
+	DWORD bytesRead = 0;
+	if (SetFilePointer(*hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return false;
+	if (!ReadFile(*hFile, &jsonContent[0], dwSize, &bytesRead, NULL) || bytesRead != dwSize) return false;
+	if (jsonContent.compare(0, 3, "\xEF\xBB\xBF") == 0) jsonContent = jsonContent.substr(3);
 
-	if (reader.parse(readjson, root))
+	istringstream jsonContentStream(jsonContent);
+	Json::CharReaderBuilder readerBuilder;
+	Json::Value updateVal;
+	string jsonErr;
+
+	if (Json::parseFromStream(readerBuilder, jsonContentStream, &updateVal, &jsonErr))
 	{
-		if (root.isMember("SleepTime") && root["SleepTime"].isInt())
+		if (updateVal.isMember("SleepTime") && updateVal["SleepTime"].isInt())
 		{
-			ddbSetList.sleepTime = root["SleepTime"].asInt();
+			ddbSetList.sleepTime = updateVal["SleepTime"].asInt();
 		}
 
-		if (root.isMember("Mode") && root["Mode"].isObject())
+		if (updateVal.isMember("Mode") && updateVal["Mode"].isObject())
 		{
-			if (root["Mode"].isMember("Mode") && root["Mode"]["Mode"].isInt())
+			if (updateVal["Mode"].isMember("Mode") && updateVal["Mode"]["Mode"].isInt())
 			{
-				ddbSetList.mode = root["Mode"]["Mode"].asInt();
+				ddbSetList.mode = updateVal["Mode"]["Mode"].asInt();
 			}
-			if (root["Mode"].isMember("HostPath") && root["Mode"]["HostPath"].isString())
+			if (updateVal["Mode"].isMember("HostPath") && updateVal["Mode"]["HostPath"].isString())
 			{
-				ddbSetList.hostPath = StringToWstring(root["Mode"]["HostPath"].asString());
+				ddbSetList.hostPath = utf8ToUtf16(updateVal["Mode"]["HostPath"].asString());
 			}
-			if (root["Mode"].isMember("RestartHost") && root["Mode"]["RestartHost"].isBool())
+			if (updateVal["Mode"].isMember("RestartHost") && updateVal["Mode"]["RestartHost"].isBool())
 			{
-				ddbSetList.restartHost = root["Mode"]["RestartHost"].asBool();
+				ddbSetList.restartHost = updateVal["Mode"]["RestartHost"].asBool();
 			}
 		}
 
-		if (root.isMember("Intercept") && root["Intercept"].isObject())
+		if (updateVal.isMember("Intercept") && updateVal["Intercept"].isObject())
 		{
-			if (root["Intercept"].isMember("SeewoWhiteboard3Floating") && root["Intercept"]["SeewoWhiteboard3Floating"].isBool())
+			if (updateVal["Intercept"].isMember("SeewoWhiteboard3Floating") && updateVal["Intercept"]["SeewoWhiteboard3Floating"].isBool())
 			{
-				ddbSetList.InterceptWindow[0] = root["Intercept"]["SeewoWhiteboard3Floating"].asBool();
+				ddbSetList.InterceptWindow[0] = updateVal["Intercept"]["SeewoWhiteboard3Floating"].asBool();
 			}
-			if (root["Intercept"].isMember("SeewoWhiteboard5Floating") && root["Intercept"]["SeewoWhiteboard5Floating"].isBool())
+			if (updateVal["Intercept"].isMember("SeewoWhiteboard5Floating") && updateVal["Intercept"]["SeewoWhiteboard5Floating"].isBool())
 			{
-				ddbSetList.InterceptWindow[1] = root["Intercept"]["SeewoWhiteboard5Floating"].asBool();
+				ddbSetList.InterceptWindow[1] = updateVal["Intercept"]["SeewoWhiteboard5Floating"].asBool();
 			}
-			if (root["Intercept"].isMember("SeewoWhiteboard5CFloating") && root["Intercept"]["SeewoWhiteboard5CFloating"].isBool())
+			if (updateVal["Intercept"].isMember("SeewoWhiteboard5CFloating") && updateVal["Intercept"]["SeewoWhiteboard5CFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[2] = root["Intercept"]["SeewoWhiteboard5CFloating"].asBool();
+				ddbSetList.InterceptWindow[2] = updateVal["Intercept"]["SeewoWhiteboard5CFloating"].asBool();
 			}
-			if (root["Intercept"].isMember("SeewoPincoFloating") && root["Intercept"]["SeewoPincoFloating"].isBool())
+			if (updateVal["Intercept"].isMember("SeewoPincoFloating") && updateVal["Intercept"]["SeewoPincoFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[3] = ddbSetList.InterceptWindow[4] = root["Intercept"]["SeewoPincoFloating"].asBool();
+				ddbSetList.InterceptWindow[3] = ddbSetList.InterceptWindow[4] = updateVal["Intercept"]["SeewoPincoFloating"].asBool();
 			}
-			if (root["Intercept"].isMember("SeewoPPTFloating") && root["Intercept"]["SeewoPPTFloating"].isBool())
+			if (updateVal["Intercept"].isMember("SeewoPPTFloating") && updateVal["Intercept"]["SeewoPPTFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[5] = root["Intercept"]["SeewoPPTFloating"].asBool();
+				ddbSetList.InterceptWindow[5] = updateVal["Intercept"]["SeewoPPTFloating"].asBool();
 			}
-			if (root["Intercept"].isMember("AiClassFloating") && root["Intercept"]["AiClassFloating"].isBool())
+			if (updateVal["Intercept"].isMember("AiClassFloating") && updateVal["Intercept"]["AiClassFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[6] = root["Intercept"]["AiClassFloating"].asBool();
+				ddbSetList.InterceptWindow[6] = updateVal["Intercept"]["AiClassFloating"].asBool();
 			}
-			if (root["Intercept"].isMember("HiteAnnotationFloating") && root["Intercept"]["HiteAnnotationFloating"].isBool())
+			if (updateVal["Intercept"].isMember("HiteAnnotationFloating") && updateVal["Intercept"]["HiteAnnotationFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[7] = root["Intercept"]["HiteAnnotationFloating"].asBool();
+				ddbSetList.InterceptWindow[7] = updateVal["Intercept"]["HiteAnnotationFloating"].asBool();
 			}
 		}
 	}
-
-	readjson.close();
 
 	return true;
 }
-bool DdbWriteSetting(bool close)
+bool DdbWriteSetting(HANDLE* hFile, bool close)
 {
-	Json::Value root;
+	Json::Value updateVal;
 
-	root["Edition"] = Json::Value(editionDate);
+	updateVal["Edition"] = Json::Value(utf16ToUtf8(editionDate));
 
-	root["SleepTime"] = Json::Value(ddbSetList.sleepTime);
+	updateVal["SleepTime"] = Json::Value(ddbSetList.sleepTime);
 
-	root["Mode"]["Mode"] = Json::Value(ddbSetList.mode);
-	root["Mode"]["HostPath"] = Json::Value(WstringToString(ddbSetList.hostPath));
-	root["Mode"]["RestartHost"] = Json::Value(ddbSetList.restartHost);
+	updateVal["Mode"]["Mode"] = Json::Value(ddbSetList.mode);
+	updateVal["Mode"]["HostPath"] = Json::Value(utf16ToUtf8(ddbSetList.hostPath));
+	updateVal["Mode"]["RestartHost"] = Json::Value(ddbSetList.restartHost);
 
-	root["Intercept"]["SeewoWhiteboard3Floating"] = Json::Value(ddbSetList.InterceptWindow[0]);
-	root["Intercept"]["SeewoWhiteboard5Floating"] = Json::Value(ddbSetList.InterceptWindow[1]);
-	root["Intercept"]["SeewoWhiteboard5CFloating"] = Json::Value(ddbSetList.InterceptWindow[2]);
-	root["Intercept"]["SeewoPincoFloating"] = Json::Value(ddbSetList.InterceptWindow[3]);
-	root["Intercept"]["SeewoPPTFloating"] = Json::Value(ddbSetList.InterceptWindow[5]);
-	root["Intercept"]["AiClassFloating"] = Json::Value(ddbSetList.InterceptWindow[6]);
-	root["Intercept"]["HiteAnnotationFloating"] = Json::Value(ddbSetList.InterceptWindow[7]);
+	updateVal["Intercept"]["SeewoWhiteboard3Floating"] = Json::Value(ddbSetList.InterceptWindow[0]);
+	updateVal["Intercept"]["SeewoWhiteboard5Floating"] = Json::Value(ddbSetList.InterceptWindow[1]);
+	updateVal["Intercept"]["SeewoWhiteboard5CFloating"] = Json::Value(ddbSetList.InterceptWindow[2]);
+	updateVal["Intercept"]["SeewoPincoFloating"] = Json::Value(ddbSetList.InterceptWindow[3]);
+	updateVal["Intercept"]["SeewoPPTFloating"] = Json::Value(ddbSetList.InterceptWindow[5]);
+	updateVal["Intercept"]["AiClassFloating"] = Json::Value(ddbSetList.InterceptWindow[6]);
+	updateVal["Intercept"]["HiteAnnotationFloating"] = Json::Value(ddbSetList.InterceptWindow[7]);
 
-	root["~ConfigurationChange"] = Json::Value(false);
-	root["~KeepOpen"] = Json::Value(!close);
+	updateVal["~ConfigurationChange"] = Json::Value(false);
+	updateVal["~KeepOpen"] = Json::Value(!close);
 
-	Json::StreamWriterBuilder outjson;
-	outjson.settings_["emitUTF8"] = true;
-	std::unique_ptr<Json::StreamWriter> writer(outjson.newStreamWriter());
-	ofstream writejson;
-	writejson.imbue(locale("zh_CN.UTF8"));
-	writejson.open(WstringToString(StringToWstring(globalPath) + L"interaction_configuration.json").c_str());
-	writer->write(root, &writejson);
-	writejson.close();
+	if (SetFilePointer(hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return false;
+	if (!SetEndOfFile(hFile)) return false;
 
+	Json::StreamWriterBuilder writerBuilder;
+	string jsonContent = "\xEF\xBB\xBF" + Json::writeString(writerBuilder, updateVal);
+
+	DWORD bytesWritten = 0;
+	if (!WriteFile(hFile, jsonContent.data(), static_cast<DWORD>(jsonContent.size()), &bytesWritten, NULL) || bytesWritten != jsonContent.size()) return false;
 	return true;
 }

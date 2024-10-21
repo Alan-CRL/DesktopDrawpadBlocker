@@ -1,4 +1,4 @@
-#include "IdtGuid.h"
+ï»¿#include "IdtGuid.h"
 
 #include "IdtText.h"
 #include <sstream>
@@ -58,7 +58,7 @@ string hash32_to_guid(size_t_32 hash_value)
 	memset(chHex_str, 0, sizeof(chHex_str));
 	strcpy_s(chHex_str, hex_str3.c_str());
 
-	// ¹¹ÔìGUIDµÄ¸ñÊ½
+	// æž„é€ GUIDçš„æ ¼å¼
 	string guid_str = "{" + hex_str.substr(0, 8) + "-" + hex_str1.substr(0, 4) + "-" +
 		hex_str1.substr(4, 4) + "-" +
 		hex_str2.substr(0, 4) + "-" +
@@ -84,10 +84,10 @@ wstring GetCPUID()
 }
 void GetBoardInfo()
 {
-	// ³õÊ¼»¯COM
+	// åˆå§‹åŒ–COM
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
-	// ³õÊ¼»¯WMI
+	// åˆå§‹åŒ–WMI
 	IWbemLocator* pLoc = NULL;
 	IWbemServices* pSvc = NULL;
 	HRESULT hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID*)&pLoc);
@@ -165,7 +165,7 @@ void GetBoardInfo()
 		pLoc->Release();
 	}
 
-	// ÊÍ·ÅCOM
+	// é‡Šæ”¾COM
 	CoUninitialize();
 }
 
@@ -176,7 +176,7 @@ size_t_32 getBiosCpuDiskHashID()
 
 	GetBoardInfo();
 
-	string BoardUUID = WstringToString(BoardInfo.BoardUUID);
+	string BoardUUID = utf16ToUtf8(BoardInfo.BoardUUID);
 	if (!BoardUUID.empty() && BoardUUID.compare("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") != 0)
 	{
 		strcpy_s(chHex_str, (BoardUUID + "\r\n").c_str());
@@ -187,9 +187,9 @@ size_t_32 getBiosCpuDiskHashID()
 
 	string Guid;
 
-	string CPUID = WstringToString(GetCPUID());
-	string BoardSerialNumber = WstringToString(BoardInfo.BoardSerialNumber);
-	string MainHardDiskSerialNumber = WstringToString(BoardInfo.MainHardDiskSerialNumber);
+	string CPUID = utf16ToUtf8(GetCPUID());
+	string BoardSerialNumber = utf16ToUtf8(BoardInfo.BoardSerialNumber);
+	string MainHardDiskSerialNumber = utf16ToUtf8(BoardInfo.MainHardDiskSerialNumber);
 
 	if (!CPUID.empty()) Guid.append(CPUID + "\r\n");
 	if (!BoardSerialNumber.empty()) Guid.append(BoardSerialNumber + "\r\n");

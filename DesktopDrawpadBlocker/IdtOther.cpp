@@ -1,4 +1,4 @@
-#include "IdtOther.h"
+Ôªø#include "IdtOther.h"
 
 #include <tlhelp32.h>
 #include <psapi.h>
@@ -6,26 +6,74 @@
 
 wstring GetCurrentExeDirectory()
 {
-	wchar_t buffer[MAX_PATH];
-	DWORD length = GetModuleFileNameW(NULL, buffer, sizeof(buffer) / sizeof(wchar_t));
-	if (length == 0 || length == sizeof(buffer) / sizeof(wchar_t)) return L"";
+	DWORD bufferSize = MAX_PATH;
+	wstring buffer(bufferSize, L'\0');
+	DWORD length = 0;
+
+	while (true)
+	{
+		length = GetModuleFileNameW(NULL, &buffer[0], bufferSize);
+		if (length == 0) return L"";
+		else if (length < bufferSize)
+		{
+			buffer.resize(length);
+			break;
+		}
+		else
+		{
+			bufferSize *= 2;
+			buffer.resize(bufferSize, L'\0');
+		}
+	}
 
 	filesystem::path fullPath(buffer);
 	return fullPath.parent_path().wstring();
 }
 wstring GetCurrentExePath()
 {
-	wchar_t buffer[MAX_PATH];
-	DWORD length = GetModuleFileNameW(NULL, buffer, sizeof(buffer) / sizeof(wchar_t));
-	if (length == 0 || length == sizeof(buffer) / sizeof(wchar_t)) return L"";
+	DWORD bufferSize = MAX_PATH;
+	wstring buffer(bufferSize, L'\0');
+	DWORD length = 0;
 
-	return (wstring)buffer;
+	while (true)
+	{
+		length = GetModuleFileNameW(NULL, &buffer[0], bufferSize);
+		if (length == 0) return L"";
+		else if (length < bufferSize)
+		{
+			buffer.resize(length);
+			break;
+		}
+		else
+		{
+			bufferSize *= 2;
+			buffer.resize(bufferSize, L'\0');
+		}
+	}
+
+	return buffer;
 }
 wstring GetCurrentExeName()
 {
-	wchar_t buffer[MAX_PATH];
-	DWORD length = GetModuleFileNameW(NULL, buffer, sizeof(buffer) / sizeof(wchar_t));
-	if (length == 0 || length == sizeof(buffer) / sizeof(wchar_t)) return L"";
+	DWORD bufferSize = MAX_PATH;
+	wstring buffer(bufferSize, L'\0');
+	DWORD length = 0;
+
+	while (true)
+	{
+		length = GetModuleFileNameW(NULL, &buffer[0], bufferSize);
+		if (length == 0) return L"";
+		else if (length < bufferSize)
+		{
+			buffer.resize(length);
+			break;
+		}
+		else
+		{
+			bufferSize *= 2;
+			buffer.resize(bufferSize, L'\0');
+		}
+	}
 
 	filesystem::path fullPath(buffer);
 	return fullPath.filename().wstring();
@@ -41,8 +89,8 @@ bool isValidString(const wstring& str)
 	return true;
 }
 
-// ≥Ã–ÚΩ¯≥Ã◊¥Ã¨ªÒ»°
-bool isProcessRunning(const std::wstring& processPath)
+// Á®ãÂ∫èËøõÁ®ãÁä∂ÊÄÅËé∑Âèñ
+bool isProcessRunning(const wstring& processPath)
 {
 	PROCESSENTRY32 entry;
 	entry.dwSize = sizeof(PROCESSENTRY32);
@@ -51,13 +99,13 @@ bool isProcessRunning(const std::wstring& processPath)
 
 	if (Process32First(snapshot, &entry)) {
 		do {
-			// ¥Úø™Ω¯≥Ãæ‰±˙
+			// ÊâìÂºÄËøõÁ®ãÂè•ÊüÑ
 			HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, entry.th32ProcessID);
 			if (process == NULL) {
 				continue;
 			}
 
-			// ªÒ»°Ω¯≥ÃÕÍ’˚¬∑æ∂
+			// Ëé∑ÂèñËøõÁ®ãÂÆåÊï¥Ë∑ØÂæÑ
 			wchar_t path[MAX_PATH];
 			DWORD size = MAX_PATH;
 			if (QueryFullProcessImageName(process, 0, path, &size)) {
@@ -75,8 +123,8 @@ bool isProcessRunning(const std::wstring& processPath)
 	CloseHandle(snapshot);
 	return false;
 }
-// Ω¯≥Ã≥Ã–Ú¬∑æ∂≤È—Ø
-int ProcessRunningCnt(const std::wstring& processPath)
+// ËøõÁ®ãÁ®ãÂ∫èË∑ØÂæÑÊü•ËØ¢
+int ProcessRunningCnt(const wstring& processPath)
 {
 	int ret = 0;
 
@@ -88,7 +136,7 @@ int ProcessRunningCnt(const std::wstring& processPath)
 	{
 		while (Process32Next(snapshot, &entry))
 		{
-			// ªÒ»°Ω¯≥ÃµƒÕÍ’˚¬∑æ∂
+			// Ëé∑ÂèñËøõÁ®ãÁöÑÂÆåÊï¥Ë∑ØÂæÑ
 			wchar_t processFullPath[MAX_PATH] = L"";
 
 			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, entry.th32ProcessID);
@@ -103,7 +151,7 @@ int ProcessRunningCnt(const std::wstring& processPath)
 				CloseHandle(hProcess);
 			}
 
-			// ±»Ωœ¬∑æ∂ «∑Òœ‡Õ¨
+			// ÊØîËæÉË∑ØÂæÑÊòØÂê¶Áõ∏Âêå
 			if (wcslen(processFullPath) > 0 && wcscmp(processFullPath, processPath.c_str()) == 0) ret++;
 		}
 	}
@@ -112,16 +160,53 @@ int ProcessRunningCnt(const std::wstring& processPath)
 	return ret;
 }
 
+// Âç†Áî®Êñá‰ª∂ÔºàËØªÂÜôÊùÉÈôêÔºâ
+bool OccupyFile(HANDLE* hFile, const wstring& filePath)
+{
+	if (_waccess(filePath.c_str(), 0) == -1) return false;
+
+	for (int time = 1; time <= 5; time++)
+	{
+		*hFile = CreateFileW(
+			filePath.c_str(),
+			GENERIC_READ | GENERIC_WRITE,
+			0,              // ‰∏çÂÖ±‰∫´ÔºåÁã¨Âç†ËÆøÈóÆ
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL
+		);
+
+		if (hFile != INVALID_HANDLE_VALUE) break;
+		else if (time >= 3) return false;
+
+		this_thread::sleep_for(chrono::milliseconds(100));
+	}
+
+	if (hFile != INVALID_HANDLE_VALUE) return true;
+	return false;
+}
+// ÈáäÊîæÊñá‰ª∂
+bool UnOccupyFile(HANDLE* hFile)
+{
+	if (*hFile != NULL)
+	{
+		CloseHandle(*hFile);
+		return true;
+	}
+	return false;
+}
+
 bool DdbTrackReady;
 void DdbTrack()
 {
-	// ºÏ≤ÈÀﬁ÷˜≥Ã–Ú «∑Ò¥Ê‘⁄
+	// Ê£ÄÊü•ÂÆø‰∏ªÁ®ãÂ∫èÊòØÂê¶Â≠òÂú®
 	if (ddbSetList.mode == 1 || (ddbSetList.mode == 0 && ddbSetList.restartHost))
 	{
 		if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
 			closeSign = true;
 	}
-	// ºÏ≤ÈÀﬁ÷˜≥Ã–Ú «∑Ò‘⁄‘À––
+	// Ê£ÄÊü•ÂÆø‰∏ªÁ®ãÂ∫èÊòØÂê¶Âú®ËøêË°å
 	if (ddbSetList.mode != 0)
 	{
 		if (isProcessRunning(ddbSetList.hostPath)) ddbSetList.hostOn = true;
@@ -131,18 +216,20 @@ void DdbTrack()
 
 	for (;;)
 	{
-		// ºÏ≤ÈÀﬁ÷˜≥Ã–Ú «∑Ò¥Ê‘⁄
+		// Ê£ÄÊü•ÂÆø‰∏ªÁ®ãÂ∫èÊòØÂê¶Â≠òÂú®
 		if (ddbSetList.mode == 1 || (ddbSetList.mode == 0 && ddbSetList.restartHost))
 		{
 			if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
 				closeSign = true;
 		}
-		// ºÏ≤ÈÀﬁ÷˜≥Ã–Ú «∑Ò‘⁄‘À––
+		// Ê£ÄÊü•ÂÆø‰∏ªÁ®ãÂ∫èÊòØÂê¶Âú®ËøêË°å
 		if (ddbSetList.mode != 0)
 		{
 			if (isProcessRunning(ddbSetList.hostPath)) ddbSetList.hostOn = true;
 			else if (ddbSetList.hostOn) closeSign = true;
 		}
+		// Ê£ÄÊü•Êñá‰ª∂ËØªÂèñÊòØÂê¶Â±°Ê¨°Â§±Ë¥•
+		if (occSErrorT > 3) closeSign = true;
 
 		this_thread::sleep_for(chrono::milliseconds(500));
 	}

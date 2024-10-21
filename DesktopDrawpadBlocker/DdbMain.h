@@ -1,15 +1,12 @@
-#pragma once
+﻿#pragma once
+#define DDB_RELEASE
 
 #include <windows.h>
 #include <iostream>
 #include <filesystem>
 #include <thread>
 #include <chrono>
-
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/rotating_file_sink.h>
-#include <spdlog/async.h>
+#include <codecvt>
 
 #include <wbemidl.h>
 #pragma comment(lib, "wbemuuid.lib")
@@ -17,10 +14,18 @@
 using namespace std;
 
 extern wstring buildTime;
-extern string editionDate;
+extern wstring editionDate;
 
 extern wstring userid;
-extern string globalPath;
-extern shared_ptr<spdlog::logger> DDBLogger;
+extern wstring globalPath;
+
+#ifndef DDB_RELEASE
+void Test();
+void Testb(bool t);
+void Testi(long long t);
+void Testw(wstring t);
+void Testa(string t);
+#endif
 
 extern bool closeSign;
+extern int occSErrorT;
