@@ -168,14 +168,14 @@ bool DdbWriteSetting(HANDLE* hFile, bool close)
 	updateVal["~ConfigurationChange"] = Json::Value(false);
 	updateVal["~KeepOpen"] = Json::Value(!close);
 
-	if (SetFilePointer(hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return false;
-	if (!SetEndOfFile(hFile)) return false;
+	if (SetFilePointer(*hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) return false;
+	if (!SetEndOfFile(*hFile)) return false;
 
 	Json::StreamWriterBuilder writerBuilder;
 	string jsonContent = Json::writeString(writerBuilder, updateVal);
 	if (usingBom) jsonContent = "\xEF\xBB\xBF" + jsonContent;
 
 	DWORD bytesWritten = 0;
-	if (!WriteFile(hFile, jsonContent.data(), static_cast<DWORD>(jsonContent.size()), &bytesWritten, NULL) || bytesWritten != jsonContent.size()) return false;
+	if (!WriteFile(*hFile, jsonContent.data(), static_cast<DWORD>(jsonContent.size()), &bytesWritten, NULL) || bytesWritten != jsonContent.size()) return false;
 	return true;
 }

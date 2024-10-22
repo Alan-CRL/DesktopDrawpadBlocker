@@ -4,7 +4,7 @@
 
 struct DdbSetListStruct
 {
-	// Ddb 配置文件版本 20241021a
+	// Ddb 配置文件版本 20241022a
 
 	DdbSetListStruct()
 	{

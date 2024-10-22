@@ -177,13 +177,13 @@ bool OccupyFile(HANDLE* hFile, const wstring& filePath)
 			NULL
 		);
 
-		if (hFile != INVALID_HANDLE_VALUE) break;
+		if (*hFile != INVALID_HANDLE_VALUE) break;
 		else if (time >= 3) return false;
 
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 
-	if (hFile != INVALID_HANDLE_VALUE) return true;
+	if (*hFile != INVALID_HANDLE_VALUE) return true;
 	return false;
 }
 // 释放文件
