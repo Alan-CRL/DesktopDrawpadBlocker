@@ -25,7 +25,7 @@
 #include <fstream>
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-wstring editionDate = L"20241022a";				//发布版本
+wstring editionDate = L"20241028a";				//发布版本
 
 wstring userid;									//用户ID
 wstring globalPath;								//程序根路径
@@ -54,7 +54,6 @@ void Testa(string t)
 #endif
 
 bool closeSign;
-int occSErrorT = 0;
 
 int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int /*nCmdShow*/)
 {
@@ -85,48 +84,24 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			if (_waccess((globalPath + L"interaction_configuration.json").c_str(), 0) == -1)
 			{
-				HANDLE fileHandle = NULL;
-				if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) DdbWriteSetting(&fileHandle, true);
-				UnOccupyFile(&fileHandle);
-
+				DdbWriteSetting(true);
 				return 0;
 			}
 		}
-		else
+		else if (!ConfigurationChange() || CloseSoftware())
 		{
-			bool flg = true;
-
-			HANDLE fileHandle = NULL;
-			if (flg && !OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) flg = false;
-			if (flg && !ConfigurationChange(&fileHandle)) flg = false;
-			if (flg && CloseSoftware(&fileHandle)) flg = false;
-
-			if (!flg)
-			{
-				DdbWriteSetting(&fileHandle, true);
-				UnOccupyFile(&fileHandle);
-
-				return 0;
-			}
-			UnOccupyFile(&fileHandle);
+			DdbWriteSetting(true);
+			return 0;
 		}
 
-		HANDLE fileHandle = NULL;
-		if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json"))
-		{
-			DdbReadSetting(&fileHandle);
-			DdbWriteSetting(&fileHandle);
-		}
-		UnOccupyFile(&fileHandle);
+		DdbReadSetting();
+		DdbWriteSetting();
 	}
 	// 程序模式初始化
 	{
 		if (ddbSetList.mode == 2 && !isProcessRunning(ddbSetList.hostPath))
 		{
-			HANDLE fileHandle = NULL;
-			if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) DdbWriteSetting(&fileHandle, true);
-			UnOccupyFile(&fileHandle);
-
+			DdbWriteSetting(true);
 			return 0;
 		}
 		else if (ddbSetList.mode == 2) ddbSetList.hostOn = true;
@@ -220,35 +195,15 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 	// 开始拦截悬浮窗
 	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(ddbSetList.sleepTime)))
 	{
-		// 占用文件读写权限
-		HANDLE fileHandle = NULL;
-		{
-			bool occS = OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json");
-			if (!occS)
-			{
-				occSErrorT++;
-				UnOccupyFile(&fileHandle);
-				continue;
-			}
-			else occSErrorT = 0;
-		}
-
 		// 查询程序是否需要关闭
-		if (CloseSoftware(&fileHandle))
-		{
-			UnOccupyFile(&fileHandle);
-			break;
-		}
+		if (CloseSoftware()) break;
 
 		// 查询配置文件是否修改
-		if (ConfigurationChange(&fileHandle))
+		if (ConfigurationChange())
 		{
-			DdbReadSetting(&fileHandle);
-			DdbWriteSetting(&fileHandle);
+			DdbReadSetting();
+			DdbWriteSetting();
 		}
-
-		// 解除文件读写权限
-		UnOccupyFile(&fileHandle);
 
 		// 拦截窗口
 		bool res = DdbIntercept();
@@ -264,9 +219,6 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		}
 	}
 
-	HANDLE fileHandle = NULL;
-	if (OccupyFile(&fileHandle, globalPath + L"interaction_configuration.json")) DdbWriteSetting(&fileHandle, true);
-	UnOccupyFile(&fileHandle);
-
+	DdbWriteSetting(true);
 	return 0;
 }

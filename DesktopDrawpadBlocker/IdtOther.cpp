@@ -160,43 +160,6 @@ int ProcessRunningCnt(const wstring& processPath)
 	return ret;
 }
 
-// 占用文件（读写权限）
-bool OccupyFile(HANDLE* hFile, const wstring& filePath)
-{
-	if (_waccess(filePath.c_str(), 0) == -1) return false;
-
-	for (int time = 1; time <= 5; time++)
-	{
-		*hFile = CreateFileW(
-			filePath.c_str(),
-			GENERIC_READ | GENERIC_WRITE,
-			0,              // 不共享，独占访问
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL
-		);
-
-		if (*hFile != INVALID_HANDLE_VALUE) break;
-		else if (time >= 3) return false;
-
-		this_thread::sleep_for(chrono::milliseconds(100));
-	}
-
-	if (*hFile != INVALID_HANDLE_VALUE) return true;
-	return false;
-}
-// 释放文件
-bool UnOccupyFile(HANDLE* hFile)
-{
-	if (*hFile != NULL)
-	{
-		CloseHandle(*hFile);
-		return true;
-	}
-	return false;
-}
-
 bool DdbTrackReady;
 void DdbTrack()
 {
@@ -228,8 +191,6 @@ void DdbTrack()
 			if (isProcessRunning(ddbSetList.hostPath)) ddbSetList.hostOn = true;
 			else if (ddbSetList.hostOn) closeSign = true;
 		}
-		// 检查文件读取是否屡次失败
-		if (occSErrorT > 3) closeSign = true;
 
 		this_thread::sleep_for(chrono::milliseconds(500));
 	}

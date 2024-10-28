@@ -13,8 +13,5 @@ bool isValidString(const wstring& str);
 bool isProcessRunning(const std::wstring& processPath);
 int ProcessRunningCnt(const std::wstring& processPath);
 
-bool OccupyFile(HANDLE* hFile, const wstring& filePath);
-bool UnOccupyFile(HANDLE* hFile);
-
 extern bool DdbTrackReady;
 void DdbTrack();

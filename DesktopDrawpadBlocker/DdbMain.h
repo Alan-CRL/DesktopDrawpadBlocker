@@ -28,4 +28,3 @@ void Testa(string t);
 #endif
 
 extern bool closeSign;
-extern int occSErrorT;

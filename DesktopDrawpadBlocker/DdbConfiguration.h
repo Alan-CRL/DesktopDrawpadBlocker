@@ -4,7 +4,7 @@
 
 struct DdbSetListStruct
 {
-	// Ddb 配置文件版本 20241022a
+	// Ddb 配置文件版本 20241028a
 
 	DdbSetListStruct()
 	{
@@ -29,8 +29,12 @@ extern DdbSetListStruct ddbSetList;
 
 extern bool usingBom;
 
-bool ConfigurationChange(HANDLE* hFile);
-bool CloseSoftware(HANDLE* hFile);
+bool OccupyFileForRead(HANDLE* hFile, const wstring& filePath);
+bool OccupyFileForWrite(HANDLE* hFile, const wstring& filePath);
+bool UnOccupyFile(HANDLE* hFile);
 
-bool DdbReadSetting(HANDLE* hFile);
-bool DdbWriteSetting(HANDLE* hFile, bool close = false);
+bool ConfigurationChange();
+bool CloseSoftware();
+
+bool DdbReadSetting();
+bool DdbWriteSetting(bool close = false);
