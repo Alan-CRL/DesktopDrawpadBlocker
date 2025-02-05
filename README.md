@@ -127,7 +127,7 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 `Q` 开启启动时需要设置 `~ConfigurationChange` 和 `~KeepOpen` 值吗？  
 `A` 不需要，但是**添加开机启动项时务必注意需要添加启动参数：**` -startup` 或在根目录下创建一个空白文件 `start_up.signal`，开机启动时不会检查这个两个值的合理性。 
 
-`Q` `interaction_configuration.json` 的文件编码格式是？
+`Q` `interaction_configuration.json` 的文件编码格式是？  
 `A` Utf8 或 Utf8 BOM（带签名），程序输出的 json 和输入编码一致。   
 
 ## 项目引用
