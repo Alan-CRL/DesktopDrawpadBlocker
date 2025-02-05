@@ -6,7 +6,7 @@
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 
-WindowSearchStruct WindowSearch[10];
+WindowSearchStruct WindowSearch[30];
 int WindowSearchSize;
 
 BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
@@ -30,7 +30,6 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 			if (_tcsstr(windowTitleBuffer.get(), WindowSearch[i].windowTitle.c_str()) == NULL)
 				continue;
 		}
-
 		if (WindowSearch[i].hasStyle)
 		{
 			if (GetWindowLong(inquiryHwnd, GWL_STYLE) != WindowSearch[i].style)
@@ -82,6 +81,12 @@ bool DdbIntercept()
 
 			PostMessage(WindowSearch[i].outHwnd, WM_CLOSE, 0, 0);
 			WindowSearch[i].foundHwnd = false;
+
+			if (IsWindow(WindowSearch[i].outHwnd))
+			{
+				// 备用方案
+				ShowWindow(WindowSearch[i].outHwnd, SW_HIDE);
+			}
 		}
 	}
 

@@ -255,7 +255,9 @@ bool DdbReadSetting()
 			}
 			if (updateVal["Intercept"].isMember("SeewoPincoFloating") && updateVal["Intercept"]["SeewoPincoFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[3] = ddbSetList.InterceptWindow[4] = updateVal["Intercept"]["SeewoPincoFloating"].asBool();
+				bool temp = updateVal["Intercept"]["SeewoPincoFloating"].asBool();
+				ddbSetList.InterceptWindow[3] = temp;
+				ddbSetList.InterceptWindow[4] = temp;
 			}
 			if (updateVal["Intercept"].isMember("SeewoPPTFloating") && updateVal["Intercept"]["SeewoPPTFloating"].isBool())
 			{
@@ -268,6 +270,30 @@ bool DdbReadSetting()
 			if (updateVal["Intercept"].isMember("HiteAnnotationFloating") && updateVal["Intercept"]["HiteAnnotationFloating"].isBool())
 			{
 				ddbSetList.InterceptWindow[7] = updateVal["Intercept"]["HiteAnnotationFloating"].asBool();
+			}
+			if (updateVal["Intercept"].isMember("ChangYanFloating") && updateVal["Intercept"]["ChangYanFloating"].isBool())
+			{
+				bool temp = updateVal["Intercept"]["ChangYanFloating"].asBool();
+				ddbSetList.InterceptWindow[8] = temp;
+				ddbSetList.InterceptWindow[9] = temp;
+				ddbSetList.InterceptWindow[10] = temp;
+				ddbSetList.InterceptWindow[11] = temp;
+				ddbSetList.InterceptWindow[12] = temp;
+				ddbSetList.InterceptWindow[13] = temp;
+				ddbSetList.InterceptWindow[14] = temp;
+				ddbSetList.InterceptWindow[15] = temp;
+				ddbSetList.InterceptWindow[16] = temp;
+				ddbSetList.InterceptWindow[17] = temp;
+				ddbSetList.InterceptWindow[18] = temp;
+				ddbSetList.InterceptWindow[19] = temp;
+				ddbSetList.InterceptWindow[20] = temp;
+			}
+			if (updateVal["Intercept"].isMember("IntelligentClassFloating") && updateVal["Intercept"]["IntelligentClassFloating"].isBool())
+			{
+				bool temp = updateVal["Intercept"]["IntelligentClassFloating"].asBool();
+				ddbSetList.InterceptWindow[21] = temp;
+				ddbSetList.InterceptWindow[22] = temp;
+				ddbSetList.InterceptWindow[23] = temp;
 			}
 		}
 	}
@@ -294,6 +320,8 @@ bool DdbWriteSetting(bool close)
 		updateVal["Intercept"]["SeewoPPTFloating"] = Json::Value(ddbSetList.InterceptWindow[5]);
 		updateVal["Intercept"]["AiClassFloating"] = Json::Value(ddbSetList.InterceptWindow[6]);
 		updateVal["Intercept"]["HiteAnnotationFloating"] = Json::Value(ddbSetList.InterceptWindow[7]);
+		updateVal["Intercept"]["ChangYanFloating"] = Json::Value(ddbSetList.InterceptWindow[8]);
+		updateVal["Intercept"]["IntelligentClassFloating"] = Json::Value(ddbSetList.InterceptWindow[21]);
 
 		updateVal["~ConfigurationChange"] = Json::Value(false);
 		updateVal["~KeepOpen"] = Json::Value(!close);

@@ -25,7 +25,7 @@
 #include <fstream>
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-wstring editionDate = L"20241028a";				//发布版本
+wstring editionDate = L"20250205a";				//发布版本
 
 wstring userid;									//用户ID
 wstring globalPath;								//程序根路径
@@ -189,7 +189,111 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[7].hasStyle = true;
 			WindowSearch[7].style = -1778384896;
 		}
-		WindowSearchSize = 8;
+		{
+			// 畅言智慧课堂 主栏悬浮窗
+			WindowSearch[8].hasWindowTitle = true;
+			WindowSearch[8].windowTitle = L"ifly";
+			WindowSearch[8].hasClassName = true;
+			WindowSearch[8].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[8].hasStyle = true;
+			WindowSearch[8].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[9].hasWindowTitle = true;
+			WindowSearch[9].windowTitle = L"画笔设置";
+			WindowSearch[9].hasClassName = true;
+			WindowSearch[9].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[9].hasStyle = true;
+			WindowSearch[9].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[10].hasWindowTitle = true;
+			WindowSearch[10].windowTitle = L"滑动清除";
+			WindowSearch[10].hasClassName = true;
+			WindowSearch[10].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[10].hasStyle = true;
+			WindowSearch[10].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[11].hasWindowTitle = true;
+			WindowSearch[11].windowTitle = L"互动";
+			WindowSearch[11].hasClassName = true;
+			WindowSearch[11].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[11].hasStyle = true;
+			WindowSearch[11].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[12].hasWindowTitle = true;
+			WindowSearch[12].windowTitle = L"学科应用";
+			WindowSearch[12].hasClassName = true;
+			WindowSearch[12].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[12].hasStyle = true;
+			WindowSearch[12].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[13].hasWindowTitle = true;
+			WindowSearch[13].windowTitle = L"管控";
+			WindowSearch[13].hasClassName = true;
+			WindowSearch[13].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[13].hasStyle = true;
+			WindowSearch[13].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[14].hasWindowTitle = true;
+			WindowSearch[14].windowTitle = L"通用工具";
+			WindowSearch[14].hasClassName = true;
+			WindowSearch[14].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[14].hasStyle = true;
+			WindowSearch[14].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[15].hasWindowTitle = true;
+			WindowSearch[15].windowTitle = L"SceneToolbar";
+			WindowSearch[15].hasClassName = true;
+			WindowSearch[15].className = L"Qt5QWindowOwnDCIcon";
+			WindowSearch[15].hasStyle = true;
+			WindowSearch[15].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[16].hasWindowTitle = true;
+			WindowSearch[16].windowTitle = L"DrawWindow";
+			WindowSearch[16].hasClassName = true;
+			WindowSearch[16].className = L"Qt5QWindowToolSaveBits";
+			WindowSearch[16].hasStyle = true;
+			WindowSearch[16].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+
+			// 畅言智慧课堂 PPT悬浮窗
+			WindowSearch[17].hasWindowTitle = true;
+			WindowSearch[17].windowTitle = L"Exch";
+			WindowSearch[17].hasClassName = true;
+			WindowSearch[17].className = L"Qt5QWindowToolSaveBitsOwnDC";
+			WindowSearch[17].hasStyle = true;
+			WindowSearch[17].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[18].hasWindowTitle = true;
+			WindowSearch[18].windowTitle = L"PageCtl";
+			WindowSearch[18].hasClassName = true;
+			WindowSearch[18].className = L"Qt5QWindowToolSaveBitsOwnDC";
+			WindowSearch[18].hasStyle = true;
+			WindowSearch[18].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[19].hasWindowTitle = true;
+			WindowSearch[19].windowTitle = L"Goback";
+			WindowSearch[19].hasClassName = true;
+			WindowSearch[19].className = L"Qt5QWindowToolSaveBitsOwnDC";
+			WindowSearch[19].hasStyle = true;
+			WindowSearch[19].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearch[20].hasWindowTitle = true;
+			WindowSearch[20].windowTitle = L"Preview";
+			WindowSearch[20].hasClassName = true;
+			WindowSearch[20].className = L"Qt5QWindowToolSaveBitsOwnDC";
+			WindowSearch[20].hasStyle = true;
+			WindowSearch[20].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+		}
+		{
+			// 天喻教育云互动课堂 主栏悬浮窗
+			WindowSearch[21].hasWindowTitle = true;
+			WindowSearch[21].windowTitle = L"桌面小工具 - 互动课堂";
+			WindowSearch[21].hasClassName = true;
+			WindowSearch[21].className = L"HwndWrapper[IntelligentClassApp.exe;;";
+			WindowSearch[21].hasStyle = true;
+			WindowSearch[21].style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
+			WindowSearch[22].hasWindowTitle = true;
+			WindowSearch[22].windowTitle = L"桌面小工具 - 互动课堂";
+			WindowSearch[22].hasClassName = true;
+			WindowSearch[22].className = L"HwndWrapper[IntelligentClassApp.exe;;";
+			WindowSearch[22].hasStyle = true;
+			WindowSearch[22].style = WS_VISIBLE | WS_DISABLED | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
+
+			// 天喻教育云互动课堂 PPT悬浮窗
+			WindowSearch[23].hasClassName = true;
+			WindowSearch[23].className = L"HwndWrapper[IntelligentClass.Office.PowerPoint.vsto|vstolocal;VSTA_Main;";
+			WindowSearch[23].hasStyle = true;
+			WindowSearch[23].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+		}
+		WindowSearchSize = 23 + 1;
 	}
 
 	// 开始拦截悬浮窗

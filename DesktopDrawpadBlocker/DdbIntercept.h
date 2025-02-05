@@ -20,7 +20,7 @@ struct WindowSearchStruct
 	bool foundHwnd = false;
 	HWND outHwnd = nullptr;
 };
-extern WindowSearchStruct WindowSearch[10];
+extern WindowSearchStruct WindowSearch[30];
 extern int WindowSearchSize;
 
 bool DdbIntercept();
