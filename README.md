@@ -27,12 +27,15 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 | 希沃白板3 桌面悬浮窗 | `SeewoWhiteboard3Floating` ||
 | 希沃白板5 桌面悬浮窗 | `SeewoWhiteboard5Floating` ||
 | 希沃白板5C 桌面悬浮窗 | `SeewoWhiteboard5CFloating` ||
-| 希沃品课桌面悬浮窗（包括PPT控件） | `SeewoPincoFloating` ||
+| 希沃品课教师端 桌面悬浮窗 | `SeewoPincoSideBarFloating` ||
+| 希沃品课教师端 画笔悬浮窗（包括PPT控件） | `SeewoPincoDrawingFloating` ||
 | 希沃PPT小工具 | `SeewoPPTFloating` ||
 | AiClass 桌面悬浮窗 | `AiClassFloating` ||
 | 鸿合屏幕书写 | `HiteAnnotationFloating` ||
-| 畅言智慧课堂（包括PPT控件） | `ChangYanFloating` | 需要管理员权限 |
-| 天喻教育云互动课堂（包括PPT控件） | `IntelligentClassFloating` ||
+| 畅言智慧课堂 桌面悬浮窗（包括PPT控件） | `ChangYanFloating` | 需要管理员权限 |
+| 天喻教育云互动课堂 桌面悬浮窗（包括PPT控件） | `IntelligentClassFloating` ||
+| 希沃桌面 画笔悬浮窗 | `IntelligentClassFloating` | 1.0/2.0 版本通用 |
+| 希沃桌面 侧栏悬浮窗 | `IntelligentClassFloating` | 需要管理员权限，1.0/2.0 版本通用 |
 
 如果有新的拦截需求，请添加 Issues
 
@@ -44,15 +47,18 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 
 ```json
 {
-	"Edition" : "20250205a",
+	"Edition" : "20250205b",
 	"Intercept" : 
 	{
 		"AiClassFloating" : true,
 		"ChangYanFloating" : true,
 		"HiteAnnotationFloating" : true,
 		"IntelligentClassFloating" : true,
+		"SeewoDesktopAnnotationFloating" : true,
+		"SeewoDesktopSideBarFloating" : false,
 		"SeewoPPTFloating" : true,
-		"SeewoPincoFloating" : true,
+		"SeewoPincoDrawingFloating" : true,
+		"SeewoPincoSideBarFloating" : false,
 		"SeewoWhiteboard3Floating" : true,
 		"SeewoWhiteboard5CFloating" : true,
 		"SeewoWhiteboard5Floating" : true
