@@ -22,15 +22,17 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 程序开启后，会自动读取配置文件并开始工作。同时程序也会实时地察觉配置文件的更改，并做出调整。程序启动后会创建托盘图标，在此可以让其手动刷新配置或关闭程序等。
 
 可选的拦截列表：  
-| 名称 | 标识名 |
-|---|---|
-| 希沃白板3 桌面悬浮窗 | `SeewoWhiteboard3Floating` |
-| 希沃白板5 桌面悬浮窗 | `SeewoWhiteboard5Floating` |
-| 希沃白板5C 桌面悬浮窗 | `SeewoWhiteboard5CFloating` |
-| 希沃品课桌面悬浮窗（包括PPT控件） | `SeewoPincoFloating` |
-| 希沃PPT小工具 | `SeewoPPTFloating` |
-| AiClass 桌面悬浮窗 | `AiClassFloating` |
-| 鸿合屏幕书写 | `HiteAnnotationFloating` |
+| 名称 | 标识名 | 备注 |
+|---|---|---|
+| 希沃白板3 桌面悬浮窗 | `SeewoWhiteboard3Floating` ||
+| 希沃白板5 桌面悬浮窗 | `SeewoWhiteboard5Floating` ||
+| 希沃白板5C 桌面悬浮窗 | `SeewoWhiteboard5CFloating` ||
+| 希沃品课桌面悬浮窗（包括PPT控件） | `SeewoPincoFloating` ||
+| 希沃PPT小工具 | `SeewoPPTFloating` ||
+| AiClass 桌面悬浮窗 | `AiClassFloating` ||
+| 鸿合屏幕书写 | `HiteAnnotationFloating` ||
+| 畅言智慧课堂（包括PPT控件） | `ChangYanFloating` | 需要管理员权限 |
+| 天喻教育云互动课堂（包括PPT控件） | `IntelligentClassFloating` ||
 
 如果有新的拦截需求，请添加 Issues
 
@@ -39,6 +41,33 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 
 ## 软件配置
 软件的交互和配置都由其目录下的 `interaction_configuration.json` 完成。（您可以先启动一次 DDB，会生成使用模板）
+
+```json
+{
+	"Edition" : "20250205a",
+	"Intercept" : 
+	{
+		"AiClassFloating" : true,
+		"ChangYanFloating" : true,
+		"HiteAnnotationFloating" : true,
+		"IntelligentClassFloating" : true,
+		"SeewoPPTFloating" : true,
+		"SeewoPincoFloating" : true,
+		"SeewoWhiteboard3Floating" : true,
+		"SeewoWhiteboard5CFloating" : true,
+		"SeewoWhiteboard5Floating" : true
+	},
+	"Mode" : 
+	{
+		"HostPath" : "",
+		"Mode" : 0,
+		"RestartHost" : true
+	},
+	"SleepTime" : 5000,
+	"~ConfigurationChange" : false,
+	"~KeepOpen" : false
+}
+```
 
 [utf8 string] `Edition`：表示 DDB 版本，由 DDB 反馈  
 [bool] `~ConfigurationChange`：当配置更改时应为 true，DDB 将更新配置  
@@ -80,12 +109,15 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 
 按照以下步骤修改 DDB 配置：
 
-1. 将修改后的配置写入 json 文件 
+1. 将修改后的配置写入 json 文件，指定 `~ConfigurationChange` 和 `~KeepOpen` 为 true  
 （读取配置成功后，`~ConfigurationChange` 变为 false 和 `~KeepOpen` 保持为 true）
 
 按照以下步骤关闭 DDB：
 
-1. 将配置写入 json 文，指定 `~KeepOpen` 为 false
+1. 将配置写入 json 文，指定 `~ConfigurationChange` 为 true，`~KeepOpen` 为 false  
+（DDB 关闭成功后，`~ConfigurationChange` 和 `~KeepOpen` 变为 false）
+
+`!` **Tips** DDB 只会在主循环 2-3 步骤时读取并反馈配置，注意不是实时反应。
 
 ## FAQ
 
@@ -95,7 +127,9 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 `Q` 开启启动时需要设置 `~ConfigurationChange` 和 `~KeepOpen` 值吗？  
 `A` 不需要，但是**添加开机启动项时务必注意需要添加启动参数：**` -startup` 或在根目录下创建一个空白文件 `start_up.signal`，开机启动时不会检查这个两个值的合理性。 
 
+`Q` `interaction_configuration.json` 的文件编码格式是？
+`A` Utf8 或 Utf8 BOM（带签名），程序输出的 json 和输入编码一致。   
+
 ## 项目引用
 [智绘教Inkeys](https://github.com/Alan-CRL/Intelligent-Drawing-Teaching)  
 [JsonCpp](https://github.com/open-source-parsers/jsoncpp)  
-[Spdlog](https://github.com/gabime/spdlog)  
