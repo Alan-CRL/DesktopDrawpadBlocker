@@ -34,8 +34,8 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 | 鸿合屏幕书写 | `HiteAnnotationFloating` ||
 | 畅言智慧课堂 桌面悬浮窗（包括PPT控件） | `ChangYanFloating` | 需要管理员权限 |
 | 天喻教育云互动课堂 桌面悬浮窗（包括PPT控件） | `IntelligentClassFloating` ||
-| 希沃桌面 画笔悬浮窗 | `IntelligentClassFloating` | 1.0/2.0 版本通用 |
-| 希沃桌面 侧栏悬浮窗 | `IntelligentClassFloating` | 需要管理员权限，1.0/2.0 版本通用 |
+| 希沃桌面 画笔悬浮窗 | `SeewoDesktopAnnotationFloating` | 1.0/2.0 版本通用 |
+| 希沃桌面 侧栏悬浮窗 | `SeewoDesktopSideBarFloating` | 需要管理员权限，1.0/2.0 版本通用 |
 
 如果有新的拦截需求，请添加 Issues
 
