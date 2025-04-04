@@ -164,11 +164,11 @@ bool DdbTrackReady;
 void DdbTrack()
 {
 	// 检查宿主程序是否存在
-	if (ddbSetList.mode == 1 || (ddbSetList.mode == 0 && ddbSetList.restartHost))
-	{
-		if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
-			closeSign = true;
-	}
+	//if (ddbSetList.mode == 1/* || (ddbSetList.mode == 0 && ddbSetList.restartHost)*/)
+	//{
+	//	if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
+	//		closeSign = true;
+	//}
 	// 检查宿主程序是否在运行
 	if (ddbSetList.mode != 0)
 	{
@@ -180,11 +180,11 @@ void DdbTrack()
 	for (;;)
 	{
 		// 检查宿主程序是否存在
-		if (ddbSetList.mode == 1 || (ddbSetList.mode == 0 && ddbSetList.restartHost))
-		{
-			if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
-				closeSign = true;
-		}
+		//if (ddbSetList.mode == 1/* || (ddbSetList.mode == 0 && ddbSetList.restartHost)*/)
+		//{
+		//	if (_waccess(ddbSetList.hostPath.c_str(), 0) == -1 && ddbSetList.hostPath != L"CommissioningTest")
+		//		closeSign = true;
+		//}
 		// 检查宿主程序是否在运行
 		if (ddbSetList.mode != 0)
 		{

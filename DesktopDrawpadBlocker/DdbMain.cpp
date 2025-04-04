@@ -25,7 +25,7 @@
 #include <fstream>
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-wstring editionDate = L"20250205b";				//发布版本
+wstring editionDate = L"20250404a";				//发布版本
 
 wstring userid;									//用户ID
 wstring globalPath;								//程序根路径
@@ -55,7 +55,7 @@ void Testa(string t)
 
 bool closeSign;
 
-int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int /*nCmdShow*/)
+int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR lpCmdLine, int /*nCmdShow*/)
 {
 	// 防止重复启动
 	{
@@ -72,45 +72,6 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		if (userid.empty() || !isValidString(userid)) userid = L"IDError";
 	}
 
-	// 配置文件初始化
-	{
-		wstring parameters;
-		wstringstream wss(GetCommandLineW());
-
-		getline(wss, parameters, L'-');
-		getline(wss, parameters, L' ');
-
-		if (parameters == L"startup" || _waccess((globalPath + L"start_up.signal").c_str(), 0) == 0)
-		{
-			if (_waccess((globalPath + L"interaction_configuration.json").c_str(), 0) == -1)
-			{
-				DdbWriteSetting(true);
-				return 0;
-			}
-		}
-		else if (!ConfigurationChange() || CloseSoftware())
-		{
-			DdbWriteSetting(true);
-			return 0;
-		}
-
-		DdbReadSetting();
-		DdbWriteSetting();
-	}
-	// 程序模式初始化
-	{
-		if (ddbSetList.mode == 2 && !isProcessRunning(ddbSetList.hostPath))
-		{
-			DdbWriteSetting(true);
-			return 0;
-		}
-		else if (ddbSetList.mode == 2) ddbSetList.hostOn = true;
-
-		thread ddbTrackThread(DdbTrack);
-		ddbTrackThread.detach();
-
-		while (!DdbTrackReady) this_thread::sleep_for(chrono::milliseconds(10));
-	}
 	// 拦截配置初始化
 	{
 		{
@@ -318,6 +279,45 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearch[26].style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
 		}
 		WindowSearchSize = 26 + 1;
+	}
+
+	// 配置文件初始化
+	{
+		wstring parameters;
+		wstringstream wss(lpCmdLine);
+
+		getline(wss, parameters, L'-');
+		getline(wss, parameters, L' ');
+
+		if (parameters == L"startup" || _waccess((globalPath + L"start_up.signal").c_str(), 0) == 0)
+		{
+			if (_waccess((globalPath + L"interaction_configuration.json").c_str(), 0) == -1)
+			{
+				DdbWriteSetting(true);
+				return 0;
+			}
+		}
+		else if (!ConfigurationChange() || CloseSoftware())
+		{
+			DdbWriteSetting(true);
+			return 0;
+		}
+
+		DdbReadSetting();
+		DdbWriteSetting();
+	}
+	// 程序模式初始化
+	{
+		if (ddbSetList.mode == 1 && !isProcessRunning(ddbSetList.hostPath))
+		{
+			DdbWriteSetting(true);
+			return 0;
+		}
+
+		thread ddbTrackThread(DdbTrack);
+		ddbTrackThread.detach();
+
+		while (!DdbTrackReady) this_thread::sleep_for(chrono::milliseconds(10));
 	}
 
 	// 开始拦截悬浮窗

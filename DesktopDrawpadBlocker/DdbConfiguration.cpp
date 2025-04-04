@@ -287,6 +287,10 @@ bool DdbReadSetting()
 				ddbSetList.InterceptWindow[15] = temp;
 				ddbSetList.InterceptWindow[16] = temp;
 				ddbSetList.InterceptWindow[17] = temp;
+			}
+			if (updateVal["Intercept"].isMember("ChangYanPptFloating") && updateVal["Intercept"]["ChangYanPptFloating"].isBool())
+			{
+				bool temp = updateVal["Intercept"]["ChangYanPptFloating"].asBool();
 				ddbSetList.InterceptWindow[18] = temp;
 				ddbSetList.InterceptWindow[19] = temp;
 				ddbSetList.InterceptWindow[20] = temp;
@@ -334,6 +338,7 @@ bool DdbWriteSetting(bool close)
 		updateVal["Intercept"]["AiClassFloating"] = Json::Value(ddbSetList.InterceptWindow[7]);
 		updateVal["Intercept"]["HiteAnnotationFloating"] = Json::Value(ddbSetList.InterceptWindow[8]);
 		updateVal["Intercept"]["ChangYanFloating"] = Json::Value(ddbSetList.InterceptWindow[9]);
+		updateVal["Intercept"]["ChangYanPptFloating"] = Json::Value(ddbSetList.InterceptWindow[18]);
 		updateVal["Intercept"]["IntelligentClassFloating"] = Json::Value(ddbSetList.InterceptWindow[22]);
 		updateVal["Intercept"]["SeewoDesktopAnnotationFloating"] = Json::Value(ddbSetList.InterceptWindow[25]);
 		updateVal["Intercept"]["SeewoDesktopSideBarFloating"] = Json::Value(ddbSetList.InterceptWindow[26]);

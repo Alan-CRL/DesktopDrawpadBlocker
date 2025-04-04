@@ -12,7 +12,7 @@ struct DdbSetListStruct
 
 		mode = 0;
 		hostPath = L"";
-		hostOn = false, restartHost = true;
+		hostOn = false, restartHost = false;
 
 		memset(InterceptWindow, true, sizeof(InterceptWindow));
 	}
