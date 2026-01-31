@@ -23,7 +23,7 @@ struct DdbSetListStruct
 	wstring hostPath;
 	bool hostOn, restartHost; // restartHost：（仅限独立模式）当宿主程序被关闭后，拦截到其他软件的窗口后，重启宿主程序
 
-	bool InterceptWindow[30];
+	bool InterceptWindow[40];
 };
 extern DdbSetListStruct ddbSetList;
 

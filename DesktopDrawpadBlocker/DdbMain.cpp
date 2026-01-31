@@ -25,7 +25,7 @@
 #include <fstream>
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-wstring editionDate = L"20250404a";				//发布版本
+wstring editionDate = L"20251128a";				//发布版本
 
 wstring userid;									//用户ID
 wstring globalPath;								//程序根路径
@@ -74,211 +74,453 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 
 	// 拦截配置初始化
 	{
+		// SeewoWhiteboard3Floating
 		{
 			// 希沃白板3 桌面悬浮窗
-			WindowSearch[0].hasWindowTitle = true;
-			WindowSearch[0].windowTitle = L"Note";
-			WindowSearch[0].hasClassName = true;
-			WindowSearch[0].className = L"HwndWrapper[EasiNote.exe;;";
-			WindowSearch[0].hasStyle = true;
-			WindowSearch[0].style = 370081792;
-			WindowSearch[0].hasWidthHeight = true;
-			WindowSearch[0].width = GetSystemMetrics(SM_CXSCREEN);
-			WindowSearch[0].height = GetSystemMetrics(SM_CYSCREEN);
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"Note";
+			ws.hasClassName = true;
+			ws.className = LR"(HwndWrapper\[EasiNote.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			ws.hasStyle = true;
+			ws.style = 370081792;
+			ws.hasWidthHeight = true;
+			ws.width = GetSystemMetrics(SM_CXSCREEN);
+			ws.height = GetSystemMetrics(SM_CYSCREEN);
+			windowUnionList[InterceptObjectEnum::Seewowhiteboard3Floating].windows.push_back(ws);
 		}
+		// SeewoWhiteboard5Floating
 		{
 			// 希沃白板5 桌面悬浮窗
-			WindowSearch[1].hasClassName = true;
-			WindowSearch[1].className = L"HwndWrapper[EasiNote;;";
-			WindowSearch[1].hasStyle = true;
-			WindowSearch[1].style = 369623040;
-			WindowSearch[1].hasWidthHeight = true;
-			WindowSearch[1].width = 550;
-			WindowSearch[1].height = 200;
+			WindowSearchStruct ws;
+			ws.hasClassName = true;
+			ws.className = LR"(HwndWrapper\[EasiNote;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			ws.hasStyle = true;
+			ws.style = 369623040;
+			ws.hasWidthHeight = true;
+			ws.width = 550;
+			ws.height = 200;
+			windowUnionList[InterceptObjectEnum::Seewowhiteboard5Floating].windows.push_back(ws);
 		}
 		{
 			// 希沃白板5C 桌面悬浮窗
-			WindowSearch[2].hasClassName = true;
-			WindowSearch[2].className = L"HwndWrapper[EasiNote5C;;";
-			WindowSearch[2].hasStyle = true;
-			WindowSearch[2].style = 369623040;
-			WindowSearch[2].hasWidthHeight = true;
-			WindowSearch[2].width = 550;
-			WindowSearch[2].height = 200;
+			WindowSearchStruct ws;
+			ws.hasClassName = true;
+			ws.className = LR"(HwndWrapper\[EasiNote5C;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			ws.hasStyle = true;
+			ws.style = 369623040;
+			ws.hasWidthHeight = true;
+			ws.width = 550;
+			ws.height = 200;
+			windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.push_back(ws);
 		}
 		{
 			// 希沃品课教师端侧栏悬浮窗
-			WindowSearch[3].hasWindowTitle = true;
-			WindowSearch[3].windowTitle = L"希沃品课——appBar";
-			WindowSearch[3].hasClassName = true;
-			WindowSearch[3].className = L"Chrome_WidgetWin_1";
-			WindowSearch[3].hasStyle = true;
-			WindowSearch[3].style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_GROUP | WS_MINIMIZEBOX;
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"希沃品课——appBar";
+			ws.hasClassName = true;
+			ws.className = L"Chrome_WidgetWin_1";
+			ws.hasStyle = true;
+			ws.style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_GROUP | WS_MINIMIZEBOX;
+			windowUnionList[InterceptObjectEnum::SeewoPincoSideBarFloating].windows.push_back(ws);
 		}
 		{
-			// 希沃品课教师端桌面悬浮窗（包括PPT控件）
-			WindowSearch[4].hasWindowTitle = true;
-			WindowSearch[4].windowTitle = L"希沃品课——integration";
-			WindowSearch[4].hasClassName = true;
-			WindowSearch[4].className = L"Chrome_WidgetWin_1";
-			WindowSearch[4].hasStyle = true;
-			WindowSearch[4].style = 335675392;
-
-			// 希沃品课教师端桌面画板
-			WindowSearch[5].hasClassName = true;
-			WindowSearch[5].className = L"HwndWrapper[BoardService;;";
-			WindowSearch[5].hasStyle = true;
-			WindowSearch[5].style = 369623040;
-			WindowSearch[5].hasWidthHeight = true;
-			WindowSearch[5].width = GetSystemMetrics(SM_CXSCREEN);
-			WindowSearch[5].height = GetSystemMetrics(SM_CYSCREEN);
+			{
+				// 希沃品课教师端桌面悬浮窗（包括PPT控件）
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"希沃品课——integration";
+				ws.hasClassName = true;
+				ws.className = L"Chrome_WidgetWin_1";
+				ws.hasStyle = true;
+				ws.style = 335675392;
+				windowUnionList[InterceptObjectEnum::SeewoPincoDrawingFloating].windows.push_back(ws);
+			}
+			{
+				// 希沃品课教师端桌面画板
+				WindowSearchStruct ws;
+				ws.hasClassName = true;
+				ws.className = LR"(HwndWrapper\[BoardService;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				ws.hasStyle = true;
+				ws.style = 369623040;
+				ws.hasWidthHeight = true;
+				ws.width = GetSystemMetrics(SM_CXSCREEN);
+				ws.height = GetSystemMetrics(SM_CYSCREEN);
+				windowUnionList[InterceptObjectEnum::SeewoPincoDrawingFloating].windows.push_back(ws);
+			}
 		}
 		{
 			// 希沃PPT小工具
-			WindowSearch[6].hasClassName = true;
-			WindowSearch[6].className = L"HwndWrapper[PPTService.exe;;";
-			WindowSearch[6].hasStyle = true;
-			WindowSearch[6].style = 369623040;
+			WindowSearchStruct ws;
+			ws.hasClassName = true;
+			ws.className = LR"(HwndWrapper\[PPTService.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			ws.hasStyle = true;
+			ws.style = 369623040;
+			windowUnionList[InterceptObjectEnum::SeewoPPTFloating].windows.push_back(ws);
 		}
 		{
 			// AiClass 桌面悬浮窗
-			WindowSearch[7].hasClassName = true;
-			WindowSearch[7].className = L"UIWndTransparent";
-			WindowSearch[7].hasWindowTitle = true;
-			WindowSearch[7].windowTitle = L"TransparentWindow";
-			WindowSearch[7].hasStyle = true;
-			WindowSearch[7].style = -2080374784;
+			WindowSearchStruct ws;
+			ws.hasClassName = true;
+			ws.className = L"UIWndTransparent";
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"TransparentWindow";
+			ws.hasStyle = true;
+			ws.style = -2080374784;
+			windowUnionList[InterceptObjectEnum::AiClassFloating].windows.push_back(ws);
 		}
 		{
 			// 鸿合屏幕书写
-			WindowSearch[8].hasWindowTitle = true;
-			WindowSearch[8].windowTitle = L"HiteAnnotation";
-			WindowSearch[8].hasClassName = true;
-			WindowSearch[8].className = L"Qt5QWindowToolSaveBits";
-			WindowSearch[8].hasStyle = true;
-			WindowSearch[8].style = -1778384896;
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"HiteAnnotation";
+			ws.hasClassName = true;
+			ws.className = L"Qt5QWindowToolSaveBits";
+			ws.hasStyle = true;
+			ws.style = -1778384896;
+			windowUnionList[InterceptObjectEnum::HiteAnnotationFloating].windows.push_back(ws);
+		}
+
+		// 畅言智慧课堂 主栏悬浮窗
+		{
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"ifly";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon"; // 有报告指出可能变为 Qt5QWindowDCIcon
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"画笔设置";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"滑动清除";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"互动";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"学科应用";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"管控";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"通用工具";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"SceneToolbar";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowOwnDCIcon";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"DrawWindow";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowToolSaveBits";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
+			}
+		}
+
+		// 畅言智慧课堂 PPT悬浮窗
+		{
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"Exch";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowToolSaveBitsOwnDC";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanPptFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"PageCtl";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowToolSaveBitsOwnDC";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanPptFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"Goback";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowToolSaveBitsOwnDC";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanPptFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"Preview";
+				ws.hasClassName = true;
+				ws.className = L"Qt5QWindowToolSaveBitsOwnDC";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::ChangYanPptFloating].windows.push_back(ws);
+			}
+		}
+
+		{
+			{
+				// 天喻教育云互动课堂 主栏悬浮窗
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"桌面小工具 - 互动课堂";
+				ws.hasClassName = true;
+				ws.className = LR"(HwndWrapper\[IntelligentClassApp.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				ws.hasStyle = true;
+				ws.style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
+				windowUnionList[InterceptObjectEnum::IntelligentClassFloating].windows.push_back(ws);
+			}
+			{
+				// 天喻教育云互动课堂 主栏悬浮窗 (disabled状态)
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"桌面小工具 - 互动课堂";
+				ws.hasClassName = true;
+				ws.className = LR"(HwndWrapper\[IntelligentClassApp.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				ws.hasStyle = true;
+				ws.style = WS_VISIBLE | WS_DISABLED | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
+				windowUnionList[InterceptObjectEnum::IntelligentClassFloating].windows.push_back(ws);
+			}
 		}
 		{
-			// 畅言智慧课堂 主栏悬浮窗
-			WindowSearch[9].hasWindowTitle = true;
-			WindowSearch[9].windowTitle = L"ifly";
-			WindowSearch[9].hasClassName = true;
-			WindowSearch[9].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[9].hasStyle = true;
-			WindowSearch[9].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[10].hasWindowTitle = true;
-			WindowSearch[10].windowTitle = L"画笔设置";
-			WindowSearch[10].hasClassName = true;
-			WindowSearch[10].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[10].hasStyle = true;
-			WindowSearch[10].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[11].hasWindowTitle = true;
-			WindowSearch[11].windowTitle = L"滑动清除";
-			WindowSearch[11].hasClassName = true;
-			WindowSearch[11].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[11].hasStyle = true;
-			WindowSearch[11].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[12].hasWindowTitle = true;
-			WindowSearch[12].windowTitle = L"互动";
-			WindowSearch[12].hasClassName = true;
-			WindowSearch[12].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[12].hasStyle = true;
-			WindowSearch[12].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[13].hasWindowTitle = true;
-			WindowSearch[13].windowTitle = L"学科应用";
-			WindowSearch[13].hasClassName = true;
-			WindowSearch[13].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[13].hasStyle = true;
-			WindowSearch[13].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[14].hasWindowTitle = true;
-			WindowSearch[14].windowTitle = L"管控";
-			WindowSearch[14].hasClassName = true;
-			WindowSearch[14].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[14].hasStyle = true;
-			WindowSearch[14].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[15].hasWindowTitle = true;
-			WindowSearch[15].windowTitle = L"通用工具";
-			WindowSearch[15].hasClassName = true;
-			WindowSearch[15].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[15].hasStyle = true;
-			WindowSearch[15].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[16].hasWindowTitle = true;
-			WindowSearch[16].windowTitle = L"SceneToolbar";
-			WindowSearch[16].hasClassName = true;
-			WindowSearch[16].className = L"Qt5QWindowOwnDCIcon";
-			WindowSearch[16].hasStyle = true;
-			WindowSearch[16].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[17].hasWindowTitle = true;
-			WindowSearch[17].windowTitle = L"DrawWindow";
-			WindowSearch[17].hasClassName = true;
-			WindowSearch[17].className = L"Qt5QWindowToolSaveBits";
-			WindowSearch[17].hasStyle = true;
-			WindowSearch[17].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-
-			// 畅言智慧课堂 PPT悬浮窗
-			WindowSearch[18].hasWindowTitle = true;
-			WindowSearch[18].windowTitle = L"Exch";
-			WindowSearch[18].hasClassName = true;
-			WindowSearch[18].className = L"Qt5QWindowToolSaveBitsOwnDC";
-			WindowSearch[18].hasStyle = true;
-			WindowSearch[18].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[19].hasWindowTitle = true;
-			WindowSearch[19].windowTitle = L"PageCtl";
-			WindowSearch[19].hasClassName = true;
-			WindowSearch[19].className = L"Qt5QWindowToolSaveBitsOwnDC";
-			WindowSearch[19].hasStyle = true;
-			WindowSearch[19].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[20].hasWindowTitle = true;
-			WindowSearch[20].windowTitle = L"Goback";
-			WindowSearch[20].hasClassName = true;
-			WindowSearch[20].className = L"Qt5QWindowToolSaveBitsOwnDC";
-			WindowSearch[20].hasStyle = true;
-			WindowSearch[20].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			WindowSearch[21].hasWindowTitle = true;
-			WindowSearch[21].windowTitle = L"Preview";
-			WindowSearch[21].hasClassName = true;
-			WindowSearch[21].className = L"Qt5QWindowToolSaveBitsOwnDC";
-			WindowSearch[21].hasStyle = true;
-			WindowSearch[21].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-		}
-		{
-			// 天喻教育云互动课堂 主栏悬浮窗
-			WindowSearch[22].hasWindowTitle = true;
-			WindowSearch[22].windowTitle = L"桌面小工具 - 互动课堂";
-			WindowSearch[22].hasClassName = true;
-			WindowSearch[22].className = L"HwndWrapper[IntelligentClassApp.exe;;";
-			WindowSearch[22].hasStyle = true;
-			WindowSearch[22].style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
-			WindowSearch[23].hasWindowTitle = true;
-			WindowSearch[23].windowTitle = L"桌面小工具 - 互动课堂";
-			WindowSearch[23].hasClassName = true;
-			WindowSearch[23].className = L"HwndWrapper[IntelligentClassApp.exe;;";
-			WindowSearch[23].hasStyle = true;
-			WindowSearch[23].style = WS_VISIBLE | WS_DISABLED | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
-
 			// 天喻教育云互动课堂 PPT悬浮窗（同天喻教育云教学助手）
-			WindowSearch[24].hasClassName = true;
-			WindowSearch[24].className = L"HwndWrapper[IntelligentClass.Office.PowerPoint.vsto|vstolocal;VSTA_Main;";
-			WindowSearch[24].hasStyle = true;
-			WindowSearch[24].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			WindowSearchStruct ws;
+			ws.hasClassName = true;
+			ws.className = LR"(HwndWrapper\[IntelligentClass.Office.PowerPoint.vsto|vstolocal;VSTA_Main;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			windowUnionList[InterceptObjectEnum::IntelligentClassFloating].windows.push_back(ws);
 		}
 		{
 			// 希沃桌面 画笔悬浮窗
-			WindowSearch[25].hasClassName = true;
-			WindowSearch[25].className = L"HwndWrapper[DesktopAnnotation.exe;;";
-			WindowSearch[25].hasStyle = true;
-			WindowSearch[25].style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			WindowSearchStruct ws;
+			ws.hasClassName = true;
+			ws.className = LR"(HwndWrapper\[HwndWrapper[DesktopAnnotation.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			ws.hasStyle = true;
+			ws.style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			windowUnionList[InterceptObjectEnum::SeewoDesktopAnnotationFloating].windows.push_back(ws);
 		}
 		{
 			// 希沃桌面 侧栏悬浮窗
-			WindowSearch[26].hasWindowTitle = true;
-			WindowSearch[26].windowTitle = L"ResidentSideBar";
-			WindowSearch[26].hasClassName = true;
-			WindowSearch[26].className = L"HwndWrapper[ResidentSideBar.exe;;";
-			WindowSearch[26].hasStyle = true;
-			WindowSearch[26].style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"ResidentSideBar";
+			ws.hasClassName = true;
+			ws.className = LR"(HwndWrapper\[HwndWrapper[ResidentSideBar.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			ws.hasStyle = true;
+			ws.style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
+			windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].windows.push_back(ws);
 		}
-		WindowSearchSize = 26 + 1;
+	}
+
+	// TODO 改为 vector 处理
+	// C30 智能课堂 超级白板（检测）
+	WindowSearch[0].hasWindowTitle = true;
+	WindowSearch[0].windowTitle = L"畅言智慧课堂-白板";
+	WindowSearch[0].hasClassName = true;
+	WindowSearch[0].className = L"Qt5QWindowIcon";
+	WindowSearch[0].hasStyle = true;
+	WindowSearch[0].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+	WindowSearch[0].interceptType = InterceptTypeEnum::Detection;
+	WindowSearch[1].hasWindowTitle = true;
+	WindowSearch[1].windowTitle = L"畅言智慧课堂-白板-WinMode";
+	WindowSearch[1].hasClassName = true;
+	WindowSearch[1].className = L"Qt5QWindowIcon";
+	WindowSearch[1].hasStyle = true;
+	WindowSearch[1].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+	WindowSearch[1].interceptType = InterceptTypeEnum::Detection;
+
+	// C30 智能课堂 超级白板（检测）
+	WindowSearch[27].hasWindowTitle = true;
+	WindowSearch[27].windowTitle = L"超级白板1";
+	WindowSearch[27].hasClassName = true;
+	WindowSearch[27].className = L"wb_CWhiteBoardPageWnd";
+	WindowSearch[27].hasStyle = true;
+	WindowSearch[27].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+	WindowSearch[27].interceptType = InterceptTypeEnum::Detection;
+
+	// C30 智能课堂 画笔悬浮窗 + PPT 控件
+	{
+		// 此处使用一个新的枚举值 TKC30Floating 来分组
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"draw_CTransDrawWnd";
+			ws.hasClassName = true;
+			ws.className = L"draw_CTransDrawWnd";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+			ws.interceptType = InterceptTypeEnum::Move;
+			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+		}
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"工具栏";
+			ws.hasClassName = true;
+			ws.className = L"toolview";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			ws.interceptType = InterceptTypeEnum::Move;
+			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+		}
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"PenStatWnd";
+			ws.hasClassName = true;
+			ws.className = L"PenStatWnd";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			ws.interceptType = InterceptTypeEnum::Move;
+			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+		}
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"EraserWnd";
+			ws.hasClassName = true;
+			ws.className = L"EraserWnd";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			ws.interceptType = InterceptTypeEnum::Move;
+			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+		}
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"更多";
+			ws.hasClassName = true;
+			ws.className = L"more_dlg";
+			ws.hasStyle = true;
+			ws.style = WS_CLIPSIBLINGS | WS_VISIBLE | WS_CLIPCHILDREN | WS_SYSMENU | WS_THICKFRAME | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+			ws.interceptType = InterceptTypeEnum::Move;
+			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+		}
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"左翻页";
+			ws.hasClassName = true;
+			ws.className = L"LeftPageCtrlView";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			ws.interceptType = InterceptTypeEnum::Move;
+			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+		}
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"右翻页";
+			ws.hasClassName = true;
+			ws.className = L"CPageCtrlView";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			ws.interceptType = InterceptTypeEnum::Move;
+			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+		}
+	}
+
+	// C80 智能课堂 边栏悬浮窗
+	{
+		// 此处使用一个新的枚举值 TKC80Floating 来分组
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"控制工具条";
+			ws.hasClassName = true;
+			ws.className = L"ctrltool";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			ws.interceptType = InterceptTypeEnum::Hide;
+			windowUnionList[InterceptObjectEnum::TKC80Floating].windows.push_back(ws);
+		}
+		{
+			WindowSearchStruct ws;
+			ws.hasWindowTitle = true;
+			ws.windowTitle = L"浮动工具条";
+			ws.hasClassName = true;
+			ws.className = L"fold_ctrl";
+			ws.hasStyle = true;
+			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			ws.interceptType = InterceptTypeEnum::Minimize;
+			windowUnionList[InterceptObjectEnum::TKC80Floating].windows.push_back(ws);
+		}
 	}
 
 	// 配置文件初始化
