@@ -48,6 +48,9 @@
     <ClCompile Include="DdbMatch.h">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="DdbMatch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DdbMain.h">

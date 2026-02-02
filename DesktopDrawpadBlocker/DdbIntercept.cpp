@@ -1,6 +1,7 @@
 ﻿#include "DdbIntercept.h"
 
 #include "DdbConfiguration.h"
+#include "DdbMatch.h"
 
 #include <string>
 
@@ -8,92 +9,155 @@
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 
-WindowSearchStruct WindowSearch[40];
-int WindowSearchSize;
+// 拦截窗口列表
+unordered_map<InterceptObjectEnum, WindowUnionClass> windowUnionList;
+
+// 检测对象列表
+vector<pair<WindowSearchStruct, DetectObjectEnum>> detectObjectList;
+// 检测对象找到
+unordered_map<DetectObjectEnum, bool> detectObjectFoundMap;
 
 BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 {
 	EnumChildWindows(inquiryHwnd, EnumWindowsCallback, lParam);
 
-	int foundCnt = 0;
-	for (int i = 0; i < WindowSearchSize; i++)
+	for (auto i : magic_enum::enum_values<InterceptObjectEnum>() | views::take(3))
 	{
-		if (WindowSearch[i].hasClassName)
+		for (auto sw : windowUnionList[i].windows)
 		{
-			unique_ptr<TCHAR[]> classNameBuffer(new TCHAR[1024]);
-			GetClassName(inquiryHwnd, classNameBuffer.get(), 1024);
-			if (_tcsstr(classNameBuffer.get(), WindowSearch[i].className.c_str()) == NULL)
-				continue;
-		}
-		if (WindowSearch[i].hasWindowTitle)
-		{
-			unique_ptr<TCHAR[]> windowTitleBuffer(new TCHAR[1024]);
-			GetWindowText(inquiryHwnd, windowTitleBuffer.get(), 1024);
-			if (_tcsstr(windowTitleBuffer.get(), WindowSearch[i].windowTitle.c_str()) == NULL)
-				continue;
-		}
-		if (WindowSearch[i].hasStyle)
-		{
-			if (9 <= i && i <= 21)
+			if (sw.windowTitle.enable)
 			{
-				//Testi(i);
-				if ((GetWindowLong(inquiryHwnd, GWL_STYLE) & WindowSearch[i].style) != WindowSearch[i].style)
-					continue;
+				unique_ptr<TCHAR[]> windowTitleBuffer(new TCHAR[1024]);
+				GetWindowText(inquiryHwnd, windowTitleBuffer.get(), 1024);
+				auto windowTitle = wstring(windowTitleBuffer.get());
 
-				//Testi(i);
-				// GetWindowLong(inquiryHwnd, GWL_STYLE) != WindowSearch[i].style 修改一下这个，我现在判断的是，WindowSearch[i].style 是不是这个窗口的子集，类似 WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN 就是 WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN 的 true
+				if (!RegexMatch(sw.windowTitle.windowTitle, windowTitle))
+				{
+					continue;
+				}
 			}
-			else
+			if (sw.className.enable)
 			{
-				if (GetWindowLong(inquiryHwnd, GWL_STYLE) != WindowSearch[i].style)
-					continue;
-			}
-		}
-		if (WindowSearch[i].hasWidthHeight)
-		{
-			RECT rect{};
-			DwmGetWindowAttribute(inquiryHwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
-			int twidth = rect.right - rect.left, thwight = rect.bottom - rect.top;
+				unique_ptr<TCHAR[]> classNameBuffer(new TCHAR[1024]);
+				GetClassName(inquiryHwnd, classNameBuffer.get(), 1024);
+				auto className = wstring(classNameBuffer.get());
 
-			if (WindowSearch[i].width != twidth || WindowSearch[i].height != thwight)
+				if (!RegexMatch(sw.className.className, className))
+				{
+					continue;
+				}
+			}
+			cerr << 3 << " " << (int)inquiryHwnd << endl;
+			if (sw.style.enable)
 			{
-				HDC hdc = GetDC(NULL);
-				int horizontalDPI = GetDeviceCaps(hdc, LOGPIXELSX);
-				int verticalDPI = GetDeviceCaps(hdc, LOGPIXELSY);
-				ReleaseDC(NULL, hdc);
-				float scale = (horizontalDPI + verticalDPI) / 2.0f / 96.0f;
-
-				if (abs(WindowSearch[i].width * scale - twidth) > 1 || abs(WindowSearch[i].height * scale - thwight) > 1)
-					continue;
+				if (sw.style.matchType == StyleMatchTypeEnum::Subset)
+				{
+					if ((GetWindowLong(inquiryHwnd, GWL_STYLE) & sw.style.style) != sw.style.style)
+						continue;
+				}
+				else // Exact
+				{
+					if (GetWindowLong(inquiryHwnd, GWL_STYLE) != sw.style.style)
+						continue;
+				}
 			}
-		}
+			if (sw.processName.enable)
+			{
+				DWORD processId = 0;
+				GetWindowThreadProcessId(inquiryHwnd, &processId);
+				wstring processName = L"";
+				if (processId != 0)
+				{
+					// 尝试打开进程句柄
+					HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
 
-		WindowSearch[i].outHwnd = inquiryHwnd;
-		WindowSearch[i].foundHwnd = true;
+					if (hProcess)
+					{
+						wchar_t fullPath[MAX_PATH];
+						DWORD size = MAX_PATH;
+
+						// 获取完整路径 (Win7+)
+						if (QueryFullProcessImageNameW(hProcess, 0, fullPath, &size)) {
+							// 使用 filesystem 获取文件名部分（例如从 C:\A\B.exe 提取出 B.exe）
+							processName = std::filesystem::path(fullPath).filename().wstring();
+						}
+						CloseHandle(hProcess);
+					}
+				}
+
+				if (sw.processName.processName != processName)
+				{
+					continue;
+				}
+			}
+			cerr << 6 << endl;
+			if (sw.size.enable)
+			{
+				RECT rect{};
+				HRESULT hr = DwmGetWindowAttribute(inquiryHwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
+				if (FAILED(hr) || (rect.right - rect.left == 0))
+				{
+					GetWindowRect(inquiryHwnd, &rect);
+				}
+
+				int twidth = rect.right - rect.left;
+				int theight = rect.bottom - rect.top;
+
+				// 定义一个小的容差范围，防止缩放产生的 1-2 像素误差
+				const int pixelTolerance = 2;
+
+				if (sw.size.MatchType == SizeMatchTypeEnum::Exact)
+				{
+					if (twidth != sw.size.width || theight != sw.size.height)
+						continue;
+				}
+				else if (sw.size.MatchType == SizeMatchTypeEnum::Scale)
+				{
+					// 比例匹配：除了比例一致，还要确保窗口不是太小（避免除以0）
+					if (sw.size.width == 0 || sw.size.height == 0) continue;
+
+					float widthRatio = static_cast<float>(twidth) / static_cast<float>(sw.size.width);
+					float heightRatio = static_cast<float>(theight) / static_cast<float>(sw.size.height);
+
+					if (abs(widthRatio - heightRatio) > 0.03f)
+						continue;
+				}
+				else // DPIScale
+				{
+					// 3. 获取 DPI
+					HDC hdc = GetDC(inquiryHwnd); // 最好获取目标窗口所在 DC 的 DPI
+					int dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+					int dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+					ReleaseDC(inquiryHwnd, hdc);
+
+					float scaleX = dpiX / 96.0f;
+					float scaleY = dpiY / 96.0f;
+
+					// 计算理论上的缩放后尺寸
+					float targetW = static_cast<float>(sw.size.width) * scaleX;
+					float targetH = static_cast<float>(sw.size.height) * scaleY;
+
+					// 判断：由于缩放舍入（如 1.25, 1.5），允许 ±2 像素误差
+					if (abs(targetW - twidth) > (float)pixelTolerance ||
+						abs(targetH - theight) > (float)pixelTolerance)
+						continue;
+				}
+			}
+
+			// Successfully matched
+			cerr << "Find " + string(magic_enum::enum_name(i)) << " " << (int)inquiryHwnd << endl;
+		}
 	}
 
-	for (int i = 0; i < WindowSearchSize; i++)
-	{
-		if (WindowSearch[i].foundHwnd)
-			foundCnt++;
-	}
-
-	if (foundCnt == WindowSearchSize) return FALSE;
 	return TRUE;
 }
-
-struct
-{
-	bool detection27 = false; // C30 白板
-	bool detection33 = false; // 畅言 白板
-}testStruct;
-
 bool DdbIntercept()
 {
 	bool ret = false;
 
 	EnumWindows(EnumWindowsCallback, 0);
 
+	/*
 	{
 		testStruct.detection27 = false;
 		testStruct.detection33 = false;
@@ -201,7 +265,7 @@ bool DdbIntercept()
 				}
 			}
 		}
-	}
+	}*/
 
 	return ret;
 }

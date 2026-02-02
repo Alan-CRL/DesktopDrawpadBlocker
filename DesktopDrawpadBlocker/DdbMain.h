@@ -1,5 +1,5 @@
 ﻿#pragma once
-#define DDB_RELEASE
+// #define DDB_RELEASE
 
 #include <windows.h>
 #include <iostream>
@@ -10,6 +10,9 @@
 
 #include <map>
 #include <unordered_map>
+#include <ranges>
+
+#include "magic_enum/magic_enum.hpp"
 
 #include <wbemidl.h>
 #pragma comment(lib, "wbemuuid.lib")

@@ -24,9 +24,15 @@ enum class SizeMatchTypeEnum
 	DPIScale,	// 跟随DPI比例
 	Scale,		// 成比例
 };
+// 检测对象
+enum class DetectObjectEnum
+{
+	Iclass30Whiteboard,
+	ChangYanWhiteboard,
+};
 
 // 拦截窗口
-enum class InterceptObjectEnum
+enum class InterceptObjectEnum : int
 {
 	SeewoWhiteboard3Floating,
 	SeewoWhiteboard5Floating,
@@ -44,15 +50,6 @@ enum class InterceptObjectEnum
 	Iclass30Floating,
 	Iclass30SidebarFloating,
 };
-// 拦截窗口集合
-class WindowUnionClass
-{
-public:
-	IdtAtomic<bool> enable = false;
-	vector<WindowSearchStruct> windows;
-};
-// 拦截窗口列表
-unordered_map<InterceptObjectEnum, WindowUnionClass> windowUnionList;
 // 拦截窗口特征
 struct WindowSearchStruct
 {
@@ -78,13 +75,6 @@ struct WindowSearchStruct
 	struct
 	{
 		bool enable = false;
-		LONG exStyle;
-		StyleMatchTypeEnum matchType = StyleMatchTypeEnum::Subset;
-	} exStyle;
-
-	struct
-	{
-		bool enable = false;
 		wstring processName;
 	} processName;
 
@@ -104,16 +94,20 @@ struct WindowSearchStruct
 
 	InterceptTypeEnum interceptType = InterceptTypeEnum::Close;
 };
-
-// 检测对象
-enum class DetectObjectEnum
+// 拦截窗口集合
+class WindowUnionClass
 {
-	Iclass30Whiteboard,
-	ChangYanWhiteboard,
+public:
+	IdtAtomic<bool> enable = false;
+	IdtAtomic<HWND> foundHwnd = nullptr;
+	vector<WindowSearchStruct> windows;
 };
+// 拦截窗口列表
+extern unordered_map<InterceptObjectEnum, WindowUnionClass> windowUnionList;
+
 // 检测对象列表
-vector<pair<WindowSearchStruct, DetectObjectEnum>> detectObjectList;
+extern vector<pair<WindowSearchStruct, DetectObjectEnum>> detectObjectList;
 // 检测对象找到
-unordered_map<DetectObjectEnum, bool> detectObjectFoundMap;
+extern unordered_map<DetectObjectEnum, bool> detectObjectFoundMap;
 
 bool DdbIntercept();

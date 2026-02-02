@@ -91,10 +91,6 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_THICKFRAME | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 			}
 			{
-				ws.exStyle.enable = true;
-				ws.exStyle.exStyle = WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR | WS_EX_CONTROLPARENT | WS_EX_STATICEDGE | WS_EX_APPWINDOW | WS_EX_LAYERED | WS_EX_COMPOSITED;
-			}
-			{
 				ws.processName.enable = true;
 				ws.processName.processName = L"EasiNote.exe";
 			}
@@ -111,12 +107,20 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			// 希沃白板5 桌面悬浮窗
 			WindowSearchStruct ws;
 			{
+				ws.windowTitle.enable = true;
+				ws.windowTitle.windowTitle = L"";
+			}
+			{
 				ws.className.enable = true;
 				ws.className.className = LR"(HwndWrapper\[EasiNote;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
 			}
 			{
 				ws.style.enable = true;
-				ws.style.style = 369623040;
+				ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			}
+			{
+				ws.processName.enable = true;
+				ws.processName.processName = L"EasiNote.exe";
 			}
 			{
 				ws.size.enable = true;
@@ -132,7 +136,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			WindowSearchStruct ws;
 			{
 				ws.windowTitle.enable = true;
-				ws.windowTitle.windowTitle = LR"()";
+				ws.windowTitle.windowTitle = L"";
 			}
 			{
 				ws.className.enable = true;
@@ -143,8 +147,8 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
 			}
 			{
-				ws.exStyle.enable = true;
-				ws.exStyle.exStyle = WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR | WS_EX_LAYERED | WS_EX_COMPOSITED;
+				ws.processName.enable = true;
+				ws.processName.processName = L"EasiNote5C.exe";
 			}
 			{
 				ws.size.enable = true;
@@ -610,6 +614,33 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		while (!DdbTrackReady) this_thread::sleep_for(chrono::milliseconds(10));
 	}
 
+	// 创建测试控制台
+	{
+#ifndef DDB_RELEASE
+		{
+			AllocConsole();
+
+			FILE* fp;
+			freopen_s(&fp, "CONOUT$", "w", stdout);
+			freopen_s(&fp, "CONOUT$", "w", stderr);
+			freopen_s(&fp, "CONIN$", "r", stdin);
+
+			// 让 C++ 流重新与 C 的 FILE* 同步
+			// true = 同步；不传参数的重载在 C++11 之后是被弃用的（某些编译器行为不定）
+			std::ios::sync_with_stdio(true);
+
+			// 清空原来的缓冲（保证重新绑定后生效）
+			std::wcout.clear();
+			std::wcin.clear();
+			std::wcerr.clear();
+			std::cout.clear();
+			std::cin.clear();
+			std::cerr.clear();
+
+			std::wcout.imbue(std::locale("chs"));
+		}
+#endif
+	}
 	// 开始拦截悬浮窗
 	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(ddbSetList.sleepTime)))
 	{
