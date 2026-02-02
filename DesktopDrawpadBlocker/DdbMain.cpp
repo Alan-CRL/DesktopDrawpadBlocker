@@ -78,42 +78,86 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			// 希沃白板3 桌面悬浮窗
 			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"Note";
-			ws.hasClassName = true;
-			ws.className = LR"(HwndWrapper\[EasiNote.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
-			ws.hasStyle = true;
-			ws.style = 370081792;
-			ws.hasWidthHeight = true;
-			ws.width = GetSystemMetrics(SM_CXSCREEN);
-			ws.height = GetSystemMetrics(SM_CYSCREEN);
-			windowUnionList[InterceptObjectEnum::Seewowhiteboard3Floating].windows.push_back(ws);
+			{
+				ws.windowTitle.enable = true;
+				ws.windowTitle.windowTitle = LR"(Note)";
+			}
+			{
+				ws.className.enable = true;
+				ws.className.className = LR"(HwndWrapper\[EasiNote.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			}
+			{
+				ws.style.enable = true;
+				ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_THICKFRAME | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+			}
+			{
+				ws.exStyle.enable = true;
+				ws.exStyle.exStyle = WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR | WS_EX_CONTROLPARENT | WS_EX_STATICEDGE | WS_EX_APPWINDOW | WS_EX_LAYERED | WS_EX_COMPOSITED;
+			}
+			{
+				ws.processName.enable = true;
+				ws.processName.processName = L"EasiNote.exe";
+			}
+			{
+				ws.size.enable = true;
+				ws.size.width = GetSystemMetrics(SM_CXSCREEN);
+				ws.size.height = GetSystemMetrics(SM_CYSCREEN);
+				ws.size.MatchType = SizeMatchTypeEnum::Exact;
+			}
+			windowUnionList[InterceptObjectEnum::SeewoWhiteboard3Floating].windows.push_back(ws);
 		}
 		// SeewoWhiteboard5Floating
 		{
 			// 希沃白板5 桌面悬浮窗
 			WindowSearchStruct ws;
-			ws.hasClassName = true;
-			ws.className = LR"(HwndWrapper\[EasiNote;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
-			ws.hasStyle = true;
-			ws.style = 369623040;
-			ws.hasWidthHeight = true;
-			ws.width = 550;
-			ws.height = 200;
-			windowUnionList[InterceptObjectEnum::Seewowhiteboard5Floating].windows.push_back(ws);
+			{
+				ws.className.enable = true;
+				ws.className.className = LR"(HwndWrapper\[EasiNote;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			}
+			{
+				ws.style.enable = true;
+				ws.style.style = 369623040;
+			}
+			{
+				ws.size.enable = true;
+				ws.size.width = 550;
+				ws.size.height = 200;
+				ws.size.MatchType = SizeMatchTypeEnum::DPIScale;
+			}
+			windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.push_back(ws);
 		}
+		// SeewoWhiteboard5CFloating
 		{
 			// 希沃白板5C 桌面悬浮窗
 			WindowSearchStruct ws;
-			ws.hasClassName = true;
-			ws.className = LR"(HwndWrapper\[EasiNote5C;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
-			ws.hasStyle = true;
-			ws.style = 369623040;
-			ws.hasWidthHeight = true;
-			ws.width = 550;
-			ws.height = 200;
+			{
+				ws.windowTitle.enable = true;
+				ws.windowTitle.windowTitle = LR"()";
+			}
+			{
+				ws.className.enable = true;
+				ws.className.className = LR"(HwndWrapper\[EasiNote5C;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+			}
+			{
+				ws.style.enable = true;
+				ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+			}
+			{
+				ws.exStyle.enable = true;
+				ws.exStyle.exStyle = WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR | WS_EX_LAYERED | WS_EX_COMPOSITED;
+			}
+			{
+				ws.size.enable = true;
+				ws.size.width = 550;
+				ws.size.height = 200;
+				ws.size.MatchType = SizeMatchTypeEnum::DPIScale;
+			}
 			windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.push_back(ws);
 		}
+	}
+
+	/*
+		// SeewoPincoSideBarFloating
 		{
 			// 希沃品课教师端侧栏悬浮窗
 			WindowSearchStruct ws;
@@ -125,6 +169,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			ws.style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_GROUP | WS_MINIMIZEBOX;
 			windowUnionList[InterceptObjectEnum::SeewoPincoSideBarFloating].windows.push_back(ws);
 		}
+		// SeewoPincoDrawingFloating
 		{
 			{
 				// 希沃品课教师端桌面悬浮窗（包括PPT控件）
@@ -150,6 +195,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				windowUnionList[InterceptObjectEnum::SeewoPincoDrawingFloating].windows.push_back(ws);
 			}
 		}
+		// SeewoPPTFloating
 		{
 			// 希沃PPT小工具
 			WindowSearchStruct ws;
@@ -159,6 +205,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			ws.style = 369623040;
 			windowUnionList[InterceptObjectEnum::SeewoPPTFloating].windows.push_back(ws);
 		}
+		// AiClassFloating
 		{
 			// AiClass 桌面悬浮窗
 			WindowSearchStruct ws;
@@ -170,6 +217,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			ws.style = -2080374784;
 			windowUnionList[InterceptObjectEnum::AiClassFloating].windows.push_back(ws);
 		}
+		// HiteAnnotationFloating
 		{
 			// 鸿合屏幕书写
 			WindowSearchStruct ws;
@@ -181,9 +229,9 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			ws.style = -1778384896;
 			windowUnionList[InterceptObjectEnum::HiteAnnotationFloating].windows.push_back(ws);
 		}
-
-		// 畅言智慧课堂 主栏悬浮窗
+		// ChangYanFloating
 		{
+			// 畅言智慧课堂 主栏悬浮窗
 			{
 				WindowSearchStruct ws;
 				ws.hasWindowTitle = true;
@@ -284,9 +332,9 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				windowUnionList[InterceptObjectEnum::ChangYanFloating].windows.push_back(ws);
 			}
 		}
-
-		// 畅言智慧课堂 PPT悬浮窗
+		// ChangYanPptFloating
 		{
+			// 畅言智慧课堂 PPT悬浮窗
 			{
 				WindowSearchStruct ws;
 				ws.hasWindowTitle = true;
@@ -332,7 +380,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				windowUnionList[InterceptObjectEnum::ChangYanPptFloating].windows.push_back(ws);
 			}
 		}
-
+		// IntelligentClassFloating
 		{
 			{
 				// 天喻教育云互动课堂 主栏悬浮窗
@@ -356,16 +404,17 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				ws.style = WS_VISIBLE | WS_DISABLED | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
 				windowUnionList[InterceptObjectEnum::IntelligentClassFloating].windows.push_back(ws);
 			}
+			{
+				// 天喻教育云互动课堂 PPT悬浮窗（同天喻教育云教学助手）
+				WindowSearchStruct ws;
+				ws.hasClassName = true;
+				ws.className = LR"(HwndWrapper\[IntelligentClass.Office.PowerPoint.vsto|vstolocal;VSTA_Main;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+				windowUnionList[InterceptObjectEnum::IntelligentClassFloating].windows.push_back(ws);
+			}
 		}
-		{
-			// 天喻教育云互动课堂 PPT悬浮窗（同天喻教育云教学助手）
-			WindowSearchStruct ws;
-			ws.hasClassName = true;
-			ws.className = LR"(HwndWrapper\[IntelligentClass.Office.PowerPoint.vsto|vstolocal;VSTA_Main;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			windowUnionList[InterceptObjectEnum::IntelligentClassFloating].windows.push_back(ws);
-		}
+		// SeewoDesktopAnnotationFloating
 		{
 			// 希沃桌面 画笔悬浮窗
 			WindowSearchStruct ws;
@@ -375,6 +424,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			ws.style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
 			windowUnionList[InterceptObjectEnum::SeewoDesktopAnnotationFloating].windows.push_back(ws);
 		}
+		// SeewoDesktopSideBarFloating
 		{
 			// 希沃桌面 侧栏悬浮窗
 			WindowSearchStruct ws;
@@ -386,142 +436,140 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			ws.style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
 			windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].windows.push_back(ws);
 		}
+		// Iclass30Floating
+		{
+			// C30 智能课堂 画笔悬浮窗 + PPT 控件
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"draw_CTransDrawWnd";
+				ws.hasClassName = true;
+				ws.className = L"draw_CTransDrawWnd";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+				ws.interceptType = InterceptTypeEnum::Move;
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"工具栏";
+				ws.hasClassName = true;
+				ws.className = L"toolview";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				ws.interceptType = InterceptTypeEnum::Move;
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"PenStatWnd";
+				ws.hasClassName = true;
+				ws.className = L"PenStatWnd";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				ws.interceptType = InterceptTypeEnum::Move;
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"EraserWnd";
+				ws.hasClassName = true;
+				ws.className = L"EraserWnd";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				ws.interceptType = InterceptTypeEnum::Move;
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"更多";
+				ws.hasClassName = true;
+				ws.className = L"more_dlg";
+				ws.hasStyle = true;
+				ws.style = WS_CLIPSIBLINGS | WS_VISIBLE | WS_CLIPCHILDREN | WS_SYSMENU | WS_THICKFRAME | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+				ws.interceptType = InterceptTypeEnum::Move;
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"左翻页";
+				ws.hasClassName = true;
+				ws.className = L"LeftPageCtrlView";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				ws.interceptType = InterceptTypeEnum::Move;
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"右翻页";
+				ws.hasClassName = true;
+				ws.className = L"CPageCtrlView";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				ws.interceptType = InterceptTypeEnum::Move;
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.push_back(ws);
+			}
+		}
+		// Iclass30SidebarFloating
+		{
+			// C30 智能课堂 边栏悬浮窗
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"控制工具条";
+				ws.hasClassName = true;
+				ws.className = L"ctrltool";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				windowUnionList[InterceptObjectEnum::Iclass30SidebarFloating].windows.push_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.hasWindowTitle = true;
+				ws.windowTitle = L"浮动工具条";
+				ws.hasClassName = true;
+				ws.className = L"fold_ctrl";
+				ws.hasStyle = true;
+				ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				ws.interceptType = InterceptTypeEnum::Minimize;
+				windowUnionList[InterceptObjectEnum::Iclass30SidebarFloating].windows.push_back(ws);
+			}
+		}
 	}
 
-	// TODO 改为 vector 处理
-	// C30 智能课堂 超级白板（检测）
-	WindowSearch[0].hasWindowTitle = true;
-	WindowSearch[0].windowTitle = L"畅言智慧课堂-白板";
-	WindowSearch[0].hasClassName = true;
-	WindowSearch[0].className = L"Qt5QWindowIcon";
-	WindowSearch[0].hasStyle = true;
-	WindowSearch[0].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-	WindowSearch[0].interceptType = InterceptTypeEnum::Detection;
-	WindowSearch[1].hasWindowTitle = true;
-	WindowSearch[1].windowTitle = L"畅言智慧课堂-白板-WinMode";
-	WindowSearch[1].hasClassName = true;
-	WindowSearch[1].className = L"Qt5QWindowIcon";
-	WindowSearch[1].hasStyle = true;
-	WindowSearch[1].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-	WindowSearch[1].interceptType = InterceptTypeEnum::Detection;
-
-	// C30 智能课堂 超级白板（检测）
-	WindowSearch[27].hasWindowTitle = true;
-	WindowSearch[27].windowTitle = L"超级白板1";
-	WindowSearch[27].hasClassName = true;
-	WindowSearch[27].className = L"wb_CWhiteBoardPageWnd";
-	WindowSearch[27].hasStyle = true;
-	WindowSearch[27].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-	WindowSearch[27].interceptType = InterceptTypeEnum::Detection;
-
-	// C30 智能课堂 画笔悬浮窗 + PPT 控件
+	// 检测配置初始化
 	{
-		// 此处使用一个新的枚举值 TKC30Floating 来分组
 		{
 			WindowSearchStruct ws;
 			ws.hasWindowTitle = true;
-			ws.windowTitle = L"draw_CTransDrawWnd";
+			ws.windowTitle = LR"畅言智慧课堂-白板.*";
 			ws.hasClassName = true;
-			ws.className = L"draw_CTransDrawWnd";
+			ws.className = L"Qt5QWindowIcon";
 			ws.hasStyle = true;
 			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-			ws.interceptType = InterceptTypeEnum::Move;
-			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
+			ws.interceptType = InterceptTypeEnum::Detection;
+			detectObjectList.push_back(make_pair(ws, DetectObjectEnum::ChangYanWhiteboard));
 		}
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"工具栏";
-			ws.hasClassName = true;
-			ws.className = L"toolview";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			ws.interceptType = InterceptTypeEnum::Move;
-			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
-		}
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"PenStatWnd";
-			ws.hasClassName = true;
-			ws.className = L"PenStatWnd";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			ws.interceptType = InterceptTypeEnum::Move;
-			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
-		}
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"EraserWnd";
-			ws.hasClassName = true;
-			ws.className = L"EraserWnd";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			ws.interceptType = InterceptTypeEnum::Move;
-			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
-		}
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"更多";
-			ws.hasClassName = true;
-			ws.className = L"more_dlg";
-			ws.hasStyle = true;
-			ws.style = WS_CLIPSIBLINGS | WS_VISIBLE | WS_CLIPCHILDREN | WS_SYSMENU | WS_THICKFRAME | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-			ws.interceptType = InterceptTypeEnum::Move;
-			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
-		}
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"左翻页";
-			ws.hasClassName = true;
-			ws.className = L"LeftPageCtrlView";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			ws.interceptType = InterceptTypeEnum::Move;
-			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
-		}
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"右翻页";
-			ws.hasClassName = true;
-			ws.className = L"CPageCtrlView";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			ws.interceptType = InterceptTypeEnum::Move;
-			windowUnionList[InterceptObjectEnum::TKC30Floating].windows.push_back(ws);
-		}
+
+		// C30 智能课堂 超级白板（检测）
+		WindowSearch[27].hasWindowTitle = true;
+		WindowSearch[27].windowTitle = L"超级白板1";
+		WindowSearch[27].hasClassName = true;
+		WindowSearch[27].className = L"wb_CWhiteBoardPageWnd";
+		WindowSearch[27].hasStyle = true;
+		WindowSearch[27].style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+		WindowSearch[27].interceptType = InterceptTypeEnum::Detection;
 	}
 
-	// C80 智能课堂 边栏悬浮窗
-	{
-		// 此处使用一个新的枚举值 TKC80Floating 来分组
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"控制工具条";
-			ws.hasClassName = true;
-			ws.className = L"ctrltool";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			ws.interceptType = InterceptTypeEnum::Hide;
-			windowUnionList[InterceptObjectEnum::TKC80Floating].windows.push_back(ws);
-		}
-		{
-			WindowSearchStruct ws;
-			ws.hasWindowTitle = true;
-			ws.windowTitle = L"浮动工具条";
-			ws.hasClassName = true;
-			ws.className = L"fold_ctrl";
-			ws.hasStyle = true;
-			ws.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			ws.interceptType = InterceptTypeEnum::Minimize;
-			windowUnionList[InterceptObjectEnum::TKC80Floating].windows.push_back(ws);
-		}
-	}
+	*/
 
 	// 配置文件初始化
 	{

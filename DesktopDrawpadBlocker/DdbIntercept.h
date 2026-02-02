@@ -28,8 +28,8 @@ enum class SizeMatchTypeEnum
 // 拦截窗口
 enum class InterceptObjectEnum
 {
-	Seewowhiteboard3Floating,
-	Seewowhiteboard5Floating,
+	SeewoWhiteboard3Floating,
+	SeewoWhiteboard5Floating,
 	SeewoWhiteboard5CFloating,
 	SeewoPincoSideBarFloating,
 	SeewoPincoDrawingFloating,
@@ -41,11 +41,9 @@ enum class InterceptObjectEnum
 	IntelligentClassFloating,
 	SeewoDesktopAnnotationFloating,
 	SeewoDesktopSideBarFloating,
-	Iclass30Floating，
+	Iclass30Floating,
 	Iclass30SidebarFloating,
 };
-// 拦截窗口列表
-unordered_map<InterceptObjectEnum, WindowUnionClass> windowUnionList;
 // 拦截窗口集合
 class WindowUnionClass
 {
@@ -53,25 +51,58 @@ public:
 	IdtAtomic<bool> enable = false;
 	vector<WindowSearchStruct> windows;
 };
+// 拦截窗口列表
+unordered_map<InterceptObjectEnum, WindowUnionClass> windowUnionList;
 // 拦截窗口特征
 struct WindowSearchStruct
 {
-	bool hasClassName;
-	wstring className;
+	struct
+	{
+		bool enable = false;
+		wstring windowTitle;
+	} windowTitle;
 
-	bool hasWindowTitle;
-	wstring windowTitle;
+	struct
+	{
+		bool enable = false;
+		wstring className;
+	} className;
 
-	bool hasStyle;
-	LONG style;
-	StyleMatchTypeEnum styleMatchType = StyleMatchTypeEnum::Exact;
+	struct
+	{
+		bool enable = false;
+		LONG style;
+		StyleMatchTypeEnum matchType = StyleMatchTypeEnum::Subset;
+	} style;
 
-	bool hasWidthHeight;
-	int width, height;
-	SizeMatchTypeEnum sizeMatchType = SizeMatchTypeEnum::Exact;
+	struct
+	{
+		bool enable = false;
+		LONG exStyle;
+		StyleMatchTypeEnum matchType = StyleMatchTypeEnum::Subset;
+	} exStyle;
+
+	struct
+	{
+		bool enable = false;
+		wstring processName;
+	} processName;
+
+	struct
+	{
+		bool enable = false;
+		int width, height;
+		SizeMatchTypeEnum MatchType = SizeMatchTypeEnum::Exact;
+	} size;
+
+	struct
+	{
+		bool enable = false;
+		DetectObjectEnum detectTarget;
+		int prevX = 0, prevY = 0; // 自动恢复位置
+	} autoRecover;
 
 	InterceptTypeEnum interceptType = InterceptTypeEnum::Close;
-	int prevX = 0, prevY = 0; // 自动恢复位置
 };
 
 // 检测对象
