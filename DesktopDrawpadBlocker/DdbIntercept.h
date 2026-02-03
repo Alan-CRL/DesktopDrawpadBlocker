@@ -99,7 +99,6 @@ class WindowUnionClass
 {
 public:
 	IdtAtomic<bool> enable = false;
-	IdtAtomic<HWND> foundHwnd = nullptr;
 	vector<WindowSearchStruct> windows;
 };
 // 拦截窗口列表

@@ -2,8 +2,6 @@
 
 #include "DdbMain.h"
 
-#include <regex>
-
 struct MatchStruct
 {
 	MatchStruct(wstring str1)

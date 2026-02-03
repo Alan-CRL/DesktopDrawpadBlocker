@@ -78,6 +78,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			// 希沃白板3 桌面悬浮窗
 			WindowSearchStruct ws;
+			ws.interceptType = InterceptTypeEnum::Hide;
 			{
 				ws.windowTitle.enable = true;
 				ws.windowTitle.windowTitle = LR"(Note)";
@@ -106,6 +107,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			// 希沃白板5 桌面悬浮窗
 			WindowSearchStruct ws;
+			ws.interceptType = InterceptTypeEnum::Hide;
 			{
 				ws.windowTitle.enable = true;
 				ws.windowTitle.windowTitle = L"";
@@ -134,6 +136,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			// 希沃白板5C 桌面悬浮窗
 			WindowSearchStruct ws;
+			ws.interceptType = InterceptTypeEnum::Hide;
 			{
 				ws.windowTitle.enable = true;
 				ws.windowTitle.windowTitle = L"";

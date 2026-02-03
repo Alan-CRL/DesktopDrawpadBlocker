@@ -1,16 +1,16 @@
 ﻿#pragma once
 // #define DDB_RELEASE
 
-#include <windows.h>
-#include <iostream>
-#include <filesystem>
-#include <thread>
 #include <chrono>
 #include <codecvt>
-
+#include <filesystem>
+#include <iostream>
 #include <map>
-#include <unordered_map>
 #include <ranges>
+#include <regex>
+#include <thread>
+#include <unordered_map>
+#include <windows.h>
 
 #include "magic_enum/magic_enum.hpp"
 
