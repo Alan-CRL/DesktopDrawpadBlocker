@@ -23,6 +23,7 @@ enum class SizeMatchTypeEnum
 	Exact,      // 精确匹配
 	DPIScale,	// 跟随DPI比例
 	Scale,		// 成比例
+	FullScreen,	// 全屏幕
 };
 // 检测对象
 enum class DetectObjectEnum

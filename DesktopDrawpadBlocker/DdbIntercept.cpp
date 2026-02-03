@@ -24,9 +24,9 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 {
 	EnumChildWindows(inquiryHwnd, EnumWindowsCallback, lParam);
 
-	for (auto i : magic_enum::enum_values<InterceptObjectEnum>() | views::take(3))
+	for (auto i : magic_enum::enum_values<InterceptObjectEnum>())
 	{
-		for (auto sw : windowUnionList[i].windows)
+		for (auto& sw : windowUnionList[i].windows)
 		{
 			if (sw.windowTitle.enable)
 			{
@@ -123,7 +123,7 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 					if (abs(widthRatio - heightRatio) > 0.03f)
 						continue;
 				}
-				else // DPIScale
+				else if (sw.size.MatchType == SizeMatchTypeEnum::DPIScale)
 				{
 					// 3. 获取 DPI
 					HDC hdc = GetDC(inquiryHwnd); // 最好获取目标窗口所在 DC 的 DPI
@@ -143,6 +143,11 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 						abs(targetH - theight) > (float)pixelTolerance)
 						continue;
 				}
+				else if (sw.size.MatchType == SizeMatchTypeEnum::FullScreen)
+				{
+					if (twidth != GetSystemMetrics(SM_CXSCREEN) || theight != GetSystemMetrics(SM_CYSCREEN))
+						continue;
+				}
 			}
 
 			// Successfully matched
@@ -154,6 +159,59 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 
 	return TRUE;
 }
+void CollectAllWindowsRecursively(HWND currentHwnd, set<HWND>& collectedWindows)
+{
+	// 基本检查：如果窗口无效，或者已经处理过，则直接返回
+	if (!IsWindow(currentHwnd) || collectedWindows.count(currentHwnd))
+	{
+		return;
+	}
+
+	// 1. 添加当前窗口
+	collectedWindows.insert(currentHwnd);
+	// std::cerr << "Found window: " << (int)currentHwnd << std::endl;
+
+	// 2. 递归查找所有子窗口 (Parent -> Child 关系)
+	// EnumChildWindows 会遍历所有后代窗口，所以不需要在回调中再次递归。
+	// 但为了代码结构的统一性和应对某些特殊情况，手动递归是更可靠的模式。
+	// 这里我们使用一个递归的 lambda。
+	function<void(HWND)> findChildren = [&](HWND parent)
+		{
+			EnumChildWindows(parent, [](HWND child, LPARAM lParam) -> BOOL
+				{
+					auto& recursive_func = *reinterpret_cast<std::function<void(HWND)>*>(lParam);
+					recursive_func(child); // 对每个子窗口进行完整的递归查找
+					return TRUE;
+				}, reinterpret_cast<LPARAM>(&findChildren));
+		};
+
+	// 为当前窗口启动子窗口的递归查找
+	EnumChildWindows(currentHwnd, [](HWND child, LPARAM lParam) -> BOOL
+		{
+			auto& windowsSet = *reinterpret_cast<std::set<HWND>*>(lParam);
+			// 对每个直接子窗口，调用主递归函数
+			CollectAllWindowsRecursively(child, windowsSet);
+			return TRUE;
+		}, reinterpret_cast<LPARAM>(&collectedWindows));
+
+	// 3. 查找并递归处理此窗口拥有的其他顶层窗口 (Owner -> Owned 关系)
+	std::pair<HWND, std::set<HWND>*> params(currentHwnd, &collectedWindows);
+	// 我们需要遍历桌面上的所有窗口来找到它们
+	EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL
+		{
+			auto params = reinterpret_cast<std::pair<HWND, std::set<HWND>*>*>(lParam);
+			HWND ownerHwnd = params->first;
+			std::set<HWND>* windowsSet = params->second;
+
+			if (GetWindow(hwnd, GW_OWNER) == ownerHwnd)
+			{
+				// 找到了一个被拥有的窗口，对它进行完整的递归查找
+				CollectAllWindowsRecursively(hwnd, *windowsSet);
+			}
+			return TRUE;
+		}, reinterpret_cast<LPARAM>(&params));
+}
+
 bool DdbIntercept()
 {
 	bool hasIntercept = false;
@@ -161,86 +219,65 @@ bool DdbIntercept()
 	foundInterceptWindows.clear();
 	EnumWindows(EnumWindowsCallback, 0);
 
+	int temp = 1;
 	for (auto fw : foundInterceptWindows)
 	{
+		temp++;
+
 		auto hwnd = fw.second;
 		auto interceptType = fw.first->interceptType;
 
-		if (interceptType == InterceptTypeEnum::Close)
-		{
-			if (IsWindow(hwnd))
-			{
-				hasIntercept = true;
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
-			}
-		}
-		if (interceptType == InterceptTypeEnum::Minimize)
-		{
-			if (!IsIconic(hwnd))
-			{
-				hasIntercept = true;
-				ShowWindow(hwnd, SW_MINIMIZE);
-			}
-		}
-		if (interceptType == InterceptTypeEnum::Hide)
-		{
-			vector<HWND> targets;
-			targets.push_back(hwnd);
+		if (!IsWindow(hwnd)) continue;
 
-			// 1. 寻找被 hwnd 拥有的顶层窗口 (如独立的 Popup 弹窗)
-			// 这些窗口在 Win32 层级上不是 Child，但逻辑上属于 hwnd
-			EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL
+		set<HWND> targets;
+		CollectAllWindowsRecursively(hwnd, targets);
+
+		for (HWND h : targets)
+		{
+			cerr << temp << " poccess " << (int)hwnd << " " << (int)interceptType << endl;
+
+			if (interceptType == InterceptTypeEnum::Close)
+			{
+				if (IsWindow(hwnd))
 				{
-					auto& list = *reinterpret_cast<vector<HWND>*>(lParam);
-					if (GetWindow(hwnd, GW_OWNER) == list.front())
-					{
-						list.push_back(hwnd);
-					}
-					return TRUE;
-				}, reinterpret_cast<LPARAM>(&targets));
-
-			// 2. 递归查找所有子窗口 (真正的 Child 控件)
-			// 我们需要对当前列表中的每一个窗口都执行子窗口查找
-			size_t currentSize = targets.size();
-			for (size_t i = 0; i < currentSize; i++)
-			{
-				EnumChildWindows(targets[i], [](HWND child, LPARAM lParam) -> BOOL
-					{
-						reinterpret_cast<vector<HWND>*>(lParam)->push_back(child);
-						return TRUE;
-					}, reinterpret_cast<LPARAM>(&targets));
+					hasIntercept = true;
+					PostMessage(hwnd, WM_CLOSE, 0, 0);
+				}
 			}
-
-			// 3. 排序、去重并执行隐藏
-			ranges::sort(targets);
-			auto [first, last] = ranges::unique(targets);
-			targets.erase(first, last);
-
-			ranges::for_each(targets, [&](HWND h)
-				{
-					if (IsWindowVisible(h))
-					{
-						ShowWindow(h, SW_HIDE);
-
-						hasIntercept = true;
-						cerr << "Hide " << (int)h << endl;
-					}
-				});
-		}
-		if (interceptType == InterceptTypeEnum::Move)
-		{
-			RECT rect{};
-			GetWindowRect(hwnd, &rect);
-			int x = rect.left;
-			int y = rect.top;
-
-			if (x != -32000 || y != -32000)
+			if (interceptType == InterceptTypeEnum::Minimize)
 			{
-				fw.first->autoRecover.prevX = x;
-				fw.first->autoRecover.prevY = y;
+				if (!IsIconic(hwnd))
+				{
+					hasIntercept = true;
+					ShowWindow(hwnd, SW_MINIMIZE);
+				}
+			}
+			if (interceptType == InterceptTypeEnum::Hide)
+			{
+				if (IsWindowVisible(h))
+				{
+					ShowWindow(h, SW_HIDE);
 
-				hasIntercept = true;
-				SetWindowPos(hwnd, NULL, -32000, -32000, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+					hasIntercept = true;
+					cerr << "Hide " << (int)h << endl;
+				}
+				else cerr << "Fild Hide " << (int)h << endl;
+			}
+			if (interceptType == InterceptTypeEnum::Move)
+			{
+				RECT rect{};
+				GetWindowRect(hwnd, &rect);
+				int x = rect.left;
+				int y = rect.top;
+
+				if (x != -32000 || y != -32000)
+				{
+					fw.first->autoRecover.prevX = x;
+					fw.first->autoRecover.prevY = y;
+
+					hasIntercept = true;
+					SetWindowPos(hwnd, NULL, -32000, -32000, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+				}
 			}
 		}
 	}
