@@ -97,9 +97,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			}
 			{
 				ws.size.enable = true;
-				ws.size.width = GetSystemMetrics(SM_CXSCREEN);
-				ws.size.height = GetSystemMetrics(SM_CYSCREEN);
-				ws.size.MatchType = SizeMatchTypeEnum::Exact;
+				ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
 			}
 			windowUnionList[InterceptObjectEnum::SeewoWhiteboard3Floating].windows.emplace_back(ws);
 		}
@@ -126,9 +124,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 			}
 			{
 				ws.size.enable = true;
-				ws.size.width = 550;
-				ws.size.height = 200;
-				ws.size.MatchType = SizeMatchTypeEnum::DPIScale;
+				ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
 			}
 			windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.emplace_back(ws);
 		}
@@ -158,34 +154,6 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				{
 					ws.size.enable = true;
 					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
-				}
-				// windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.emplace_back(ws);
-			}
-			{
-				WindowSearchStruct ws;
-				ws.interceptType = InterceptTypeEnum::Hide;
-				{
-					ws.windowTitle.enable = true;
-					ws.windowTitle.windowTitle = L"";
-				}
-				{
-					ws.className.enable = true;
-					ws.className.className = LR"(HwndWrapper\[EasiNote5C;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
-				}
-				{
-					ws.style.enable = true;
-					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-					ws.style.matchType = StyleMatchTypeEnum::Subset;
-				}
-				{
-					ws.processName.enable = true;
-					ws.processName.processName = L"EasiNote5C.exe";
-				}
-				{
-					ws.size.enable = true;
-					ws.size.width = GetSystemMetrics(SM_CXSCREEN);
-					ws.size.height = GetSystemMetrics(SM_CYSCREEN);
-					ws.size.MatchType = SizeMatchTypeEnum::Exact;
 				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.emplace_back(ws);
 			}

@@ -169,7 +169,6 @@ void CollectAllWindowsRecursively(HWND currentHwnd, set<HWND>& collectedWindows)
 
 	// 1. 添加当前窗口
 	collectedWindows.insert(currentHwnd);
-	// std::cerr << "Found window: " << (int)currentHwnd << std::endl;
 
 	// 2. 递归查找所有子窗口 (Parent -> Child 关系)
 	// EnumChildWindows 会遍历所有后代窗口，所以不需要在回调中再次递归。
@@ -188,20 +187,20 @@ void CollectAllWindowsRecursively(HWND currentHwnd, set<HWND>& collectedWindows)
 	// 为当前窗口启动子窗口的递归查找
 	EnumChildWindows(currentHwnd, [](HWND child, LPARAM lParam) -> BOOL
 		{
-			auto& windowsSet = *reinterpret_cast<std::set<HWND>*>(lParam);
+			auto& windowsSet = *reinterpret_cast<set<HWND>*>(lParam);
 			// 对每个直接子窗口，调用主递归函数
 			CollectAllWindowsRecursively(child, windowsSet);
 			return TRUE;
 		}, reinterpret_cast<LPARAM>(&collectedWindows));
 
 	// 3. 查找并递归处理此窗口拥有的其他顶层窗口 (Owner -> Owned 关系)
-	std::pair<HWND, std::set<HWND>*> params(currentHwnd, &collectedWindows);
+	pair<HWND, set<HWND>*> params(currentHwnd, &collectedWindows);
 	// 我们需要遍历桌面上的所有窗口来找到它们
 	EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL
 		{
-			auto params = reinterpret_cast<std::pair<HWND, std::set<HWND>*>*>(lParam);
+			auto params = reinterpret_cast<pair<HWND, set<HWND>*>*>(lParam);
 			HWND ownerHwnd = params->first;
-			std::set<HWND>* windowsSet = params->second;
+			set<HWND>* windowsSet = params->second;
 
 			if (GetWindow(hwnd, GW_OWNER) == ownerHwnd)
 			{
