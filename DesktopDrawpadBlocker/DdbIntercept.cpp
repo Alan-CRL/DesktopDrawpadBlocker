@@ -159,18 +159,9 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 
 	return TRUE;
 }
-void CollectAllWindowsRecursively(HWND currentHwnd, set<HWND>& collectedWindows)
+void CollectChild(HWND currentHwnd, set<HWND>& collectedWindows)
 {
-	// 基本检查：如果窗口无效，或者已经处理过，则直接返回
-	if (!IsWindow(currentHwnd) || collectedWindows.count(currentHwnd))
-	{
-		return;
-	}
-
-	// 1. 添加当前窗口
-	collectedWindows.insert(currentHwnd);
-
-	// 2. 递归查找所有子窗口 (Parent -> Child 关系)
+	// 递归查找所有子窗口 (Parent -> Child 关系)
 	// EnumChildWindows 会遍历所有后代窗口，所以不需要在回调中再次递归。
 	// 但为了代码结构的统一性和应对某些特殊情况，手动递归是更可靠的模式。
 	// 这里我们使用一个递归的 lambda。
@@ -178,7 +169,7 @@ void CollectAllWindowsRecursively(HWND currentHwnd, set<HWND>& collectedWindows)
 		{
 			EnumChildWindows(parent, [](HWND child, LPARAM lParam) -> BOOL
 				{
-					auto& recursive_func = *reinterpret_cast<std::function<void(HWND)>*>(lParam);
+					auto& recursive_func = *reinterpret_cast<function<void(HWND)>*>(lParam);
 					recursive_func(child); // 对每个子窗口进行完整的递归查找
 					return TRUE;
 				}, reinterpret_cast<LPARAM>(&findChildren));
@@ -189,11 +180,15 @@ void CollectAllWindowsRecursively(HWND currentHwnd, set<HWND>& collectedWindows)
 		{
 			auto& windowsSet = *reinterpret_cast<set<HWND>*>(lParam);
 			// 对每个直接子窗口，调用主递归函数
-			CollectAllWindowsRecursively(child, windowsSet);
+			if (IsWindow(child) && !windowsSet.count(child))
+			{
+				windowsSet.insert(child);
+				CollectChild(child, windowsSet);
+			}
 			return TRUE;
 		}, reinterpret_cast<LPARAM>(&collectedWindows));
 
-	// 3. 查找并递归处理此窗口拥有的其他顶层窗口 (Owner -> Owned 关系)
+	// 查找并递归处理此窗口拥有的其他顶层窗口 (Owner -> Owned 关系)
 	pair<HWND, set<HWND>*> params(currentHwnd, &collectedWindows);
 	// 我们需要遍历桌面上的所有窗口来找到它们
 	EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL
@@ -205,7 +200,11 @@ void CollectAllWindowsRecursively(HWND currentHwnd, set<HWND>& collectedWindows)
 			if (GetWindow(hwnd, GW_OWNER) == ownerHwnd)
 			{
 				// 找到了一个被拥有的窗口，对它进行完整的递归查找
-				CollectAllWindowsRecursively(hwnd, *windowsSet);
+				if (IsWindow(hwnd) && !windowsSet->count(hwnd))
+				{
+					windowsSet->insert(hwnd);
+					CollectChild(hwnd, *windowsSet);
+				}
 			}
 			return TRUE;
 		}, reinterpret_cast<LPARAM>(&params));
@@ -218,30 +217,36 @@ bool DdbIntercept()
 	foundInterceptWindows.clear();
 	EnumWindows(EnumWindowsCallback, 0);
 
-	int temp = 1;
 	for (auto fw : foundInterceptWindows)
 	{
-		temp++;
-
 		auto hwnd = fw.second;
 		auto interceptType = fw.first->interceptType;
 
 		if (!IsWindow(hwnd)) continue;
 
 		set<HWND> targets;
-		CollectAllWindowsRecursively(hwnd, targets);
+		if (fw.first->interceptScope == InterceptScopeEnum::SelfAndChild || fw.first->interceptScope == InterceptScopeEnum::Self)
+		{
+			targets.insert(hwnd);
+		}
+		if (fw.first->interceptScope == InterceptScopeEnum::SelfAndChild || fw.first->interceptScope == InterceptScopeEnum::Child)
+		{
+			CollectChild(hwnd, targets);
+		}
 
 		for (HWND h : targets)
 		{
-			cerr << temp << " poccess " << (int)hwnd << " " << (int)interceptType << endl;
-
 			if (interceptType == InterceptTypeEnum::Close)
 			{
 				if (IsWindow(hwnd))
 				{
 					hasIntercept = true;
 					PostMessage(hwnd, WM_CLOSE, 0, 0);
+					// 需要特别注意的是，通过发送消息的方式关闭窗口，则会导致父/子窗口由于消息传递而关闭
+
+					cerr << "Close " << (int)h << endl;
 				}
+				else cerr << "Close(Fail) " << (int)h << endl;
 			}
 			if (interceptType == InterceptTypeEnum::Minimize)
 			{
@@ -255,12 +260,11 @@ bool DdbIntercept()
 			{
 				if (IsWindowVisible(h))
 				{
-					ShowWindow(h, SW_HIDE);
-
 					hasIntercept = true;
+					ShowWindow(h, SW_HIDE);
 					cerr << "Hide " << (int)h << endl;
 				}
-				else cerr << "Fild Hide " << (int)h << endl;
+				else cerr << "Hide(Fail) " << (int)h << endl;
 			}
 			if (interceptType == InterceptTypeEnum::Move)
 			{
@@ -276,7 +280,10 @@ bool DdbIntercept()
 
 					hasIntercept = true;
 					SetWindowPos(hwnd, NULL, -32000, -32000, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+
+					cerr << "Move " << (int)h << endl;
 				}
+				else cerr << "Move(Fail) " << (int)h << endl;
 			}
 		}
 	}

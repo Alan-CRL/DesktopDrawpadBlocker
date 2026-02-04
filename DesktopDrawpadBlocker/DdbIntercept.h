@@ -11,6 +11,13 @@ enum class InterceptTypeEnum
 	Minimize,
 	Move,
 };
+// 拦截范围
+enum class InterceptScopeEnum
+{
+	Self,
+	Child,
+	SelfAndChild,
+};
 // 样式匹配类型
 enum class StyleMatchTypeEnum
 {
@@ -41,15 +48,19 @@ enum class InterceptObjectEnum : int
 	SeewoPincoSideBarFloating,
 	SeewoPincoDrawingFloating,
 	SeewoPPTFloating,
+	SeewoIwbAssistantFloating,
+	YiouBoardFloating,
 	AiClassFloating,
-	HiteAnnotationFloating,
-	ChangYanFloating,
-	ChangYanPptFloating,
+	ClassInXFloating,
 	IntelligentClassFloating,
-	SeewoDesktopAnnotationFloating,
-	SeewoDesktopSideBarFloating,
+	ChangYanFloating,
+	ChangYan5Floating,
 	Iclass30Floating,
 	Iclass30SidebarFloating,
+
+	/*
+	SeewoDesktopAnnotationFloating,
+	SeewoDesktopSideBarFloating,*/
 };
 // 拦截窗口特征
 struct WindowSearchStruct
@@ -93,6 +104,7 @@ struct WindowSearchStruct
 		int prevX = 0, prevY = 0; // 自动恢复位置
 	} autoRecover;
 
+	InterceptScopeEnum interceptScope = InterceptScopeEnum::SelfAndChild;
 	InterceptTypeEnum interceptType = InterceptTypeEnum::Close;
 };
 // 拦截窗口集合

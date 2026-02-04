@@ -25,31 +25,34 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 程序开启后，会自动读取配置文件并开始工作。同时程序也会实时地察觉配置文件的更改，并做出调整。程序启动后会创建托盘图标，在此可以让其手动刷新配置或关闭程序等。
 
 可选的拦截列表：  
-| 名称 | 标识名 | 备注 |
-|---|---|---|
-| 希沃白板3 桌面悬浮窗 | `SeewoWhiteboard3Floating` ||
-| 希沃白板5 桌面悬浮窗 | `SeewoWhiteboard5Floating` ||
-| 希沃白板5C 桌面悬浮窗 | `SeewoWhiteboard5CFloating` ||
-| 希沃品课教师端 桌面悬浮窗 | `SeewoPincoSideBarFloating` ||
-| 希沃品课教师端 画笔悬浮窗（包括PPT控件） | `SeewoPincoDrawingFloating` ||
-| 希沃PPT小工具 | `SeewoPPTFloating` ||
-| AiClass 桌面悬浮窗 | `AiClassFloating` ||
-| 鸿合屏幕书写 | `HiteAnnotationFloating` ||
-| 畅言智慧课堂 桌面悬浮窗 | `ChangYanFloating` | 支持在白板时自动恢复，需要管理员权限 |
-| 畅言智慧课堂 PPT悬浮窗 | `ChangYanPptFloating` | 需要管理员权限 |
-| 天喻教育云互动课堂 桌面悬浮窗（包括PPT控件） | `IntelligentClassFloating` ||
-| 希沃桌面 画笔悬浮窗 | `SeewoDesktopAnnotationFloating` | 1.0/2.0 版本通用 |
-| 希沃桌面 侧栏悬浮窗 | `SeewoDesktopSideBarFloating` | 需要管理员权限，1.0/2.0 版本通用 |
-| C30智能教学 桌面悬浮窗（包括PPT控件） | `Iclass30Floating` | 支持在白板时自动恢复，需要管理员权限 |
-| C30智能教学 侧栏悬浮窗 | `Iclass30SidebarFloating` | 需要管理员权限 |
+| 名称 | 标识名 | 高级功能 | 备注 | 测试时版本 |
+|---|---|---|---|---|
+| 希沃白板3 桌面画笔悬浮窗 | `SeewoWhiteboard3Floating` ||| 3.1.2.3606 |
+| 希沃白板5 桌面画笔悬浮窗 | `SeewoWhiteboard5Floating` ||| 5.2.4.9592 |
+| 希沃轻白板（5C） 桌面画笔悬浮窗 | `SeewoWhiteboard5CFloating` ||| 1.0.1.9068 |
+| 希沃品课教师端 侧栏悬浮窗 | `SeewoPincoSideBarFloating` ||| v1.2.43.7298 |
+| 希沃品课教师端 桌面画笔悬浮窗（包括PPT控件） | `SeewoPincoDrawingFloating` ||| v1.2.43.7298 |
+| 希沃PPT小工具 | `SeewoPPTFloating` ||| 1.0.0.795 |
+| 希沃课堂助手 PPT小工具 | `SeewoIwbAssistantFloating` ||| 0.0.3.1251 |
+| 欧帝白板 桌面画笔悬浮窗（包括PPT控件） | `YiouBoardFloating` || 需要DDB管理员 | 2.1.111 |
+| AiClass 桌面画笔悬浮窗 | `AiClassFloating` ||| 5.19.3.2 |
+| ClassIn X 桌面画笔悬浮窗 | `ClassInXFloating` ||| 6.0.5.3913 |
+| 天喻教育云互动课堂 桌面画笔悬浮窗（包括PPT控件） | `IntelligentClassFloating` ||| 3.1.3 |
+| 畅言智慧课堂4.0 桌面画笔悬浮窗（包括PPT控件） | `ChangYanFloating` | 支持在畅言白板时自动恢复 | 需要DDB管理员 | 4.28.2 |
+| 畅言智慧课堂5.0 桌面画笔悬浮窗（包括PPT控件） | `ChangYan5Floating` | 支持在畅言白板时自动恢复 | 需要DDB管理员 | 5.7.0.1 |
+| C30智能教学 桌面画笔悬浮窗（包括PPT控件） | `Iclass30Floating` | 支持在C30白板时自动恢复 | 需要DDB管理员 | 1.3.1460.0 |
+| C30智能教学 侧栏悬浮窗 | `Iclass30SidebarFloating` || 需要DDB管理员 | 1.3.1460.0 |
+| 希沃桌面 桌面画笔悬浮窗 | `SeewoDesktopAnnotationFloating` || 需要DDB管理员; 1.0/2.0/2.5/3.0 普教版/高教版 通用 ||
+| 希沃桌面 侧栏悬浮窗 | `SeewoDesktopSideBarFloating` || 需要DDB管理员; 1.0/2.0/2.5/3.0 普教版/高教版 通用 ||
 
 如果有新的拦截需求，请添加 Issues
 
 ## 兼容性
-程序使用 C++17 编写，最低兼容 Windows 7 sp0，并且单文件运行无需额外的运行库。运行时内存占用仅约 **5MB**。
+程序使用 C++20 编写，最低兼容 Windows 7 RTM（sp0），并且单文件运行无需额外的运行库。运行时内存占用仅约 **5MB**。
 
 ## 软件配置
-软件的交互和配置都由其目录下的 `interaction_configuration.json` 完成。（您可以先启动一次 DDB，会生成使用模板）
+软件的交互和配置都由其目录下的 `interaction_configuration.json` 完成。（您可以先启动一次 DDB，会生成使用模板）    
+缺省设置中，项目的开启和关闭默认值如下所示。  
 
 ```json
 {
