@@ -35,8 +35,9 @@ enum class SizeMatchTypeEnum
 // 检测对象
 enum class DetectObjectEnum
 {
+	ChangYan4Whiteboard,
+	ChangYan5Whiteboard,
 	Iclass30Whiteboard,
-	ChangYanWhiteboard,
 };
 
 // 拦截窗口
@@ -101,7 +102,6 @@ struct WindowSearchStruct
 	{
 		bool enable = false;
 		DetectObjectEnum detectTarget;
-		int prevX = 0, prevY = 0; // 自动恢复位置
 	} autoRecover;
 
 	InterceptScopeEnum interceptScope = InterceptScopeEnum::SelfAndChild;
@@ -111,7 +111,7 @@ struct WindowSearchStruct
 class WindowUnionClass
 {
 public:
-	IdtAtomic<bool> enable = false;
+	IdtAtomic<bool> enable = true;
 	vector<WindowSearchStruct> windows;
 };
 // 拦截窗口列表
@@ -120,6 +120,6 @@ extern unordered_map<InterceptObjectEnum, WindowUnionClass> windowUnionList;
 // 检测对象列表
 extern vector<pair<WindowSearchStruct, DetectObjectEnum>> detectObjectList;
 // 检测对象找到
-extern unordered_map<DetectObjectEnum, bool> detectObjectFoundMap;
+extern unordered_map<DetectObjectEnum, bool> foundDetectWindows;
 
 bool DdbIntercept();

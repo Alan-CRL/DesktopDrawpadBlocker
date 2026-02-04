@@ -15,145 +15,169 @@ unordered_map<InterceptObjectEnum, WindowUnionClass> windowUnionList;
 // 检测对象列表
 vector<pair<WindowSearchStruct, DetectObjectEnum>> detectObjectList;
 // 检测对象找到
-unordered_map<DetectObjectEnum, bool> detectObjectFoundMap;
+unordered_map<DetectObjectEnum, bool> foundDetectWindows;
 
 // 发现拦截窗口列表
 vector<pair<WindowSearchStruct*, HWND>> foundInterceptWindows;
+// 自动恢复位置记录
+unordered_map<HWND, pair<int, int>> autoRecoverPositions;
 
+bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd)
+{
+	if (sw.windowTitle.enable)
+	{
+		unique_ptr<TCHAR[]> windowTitleBuffer(new TCHAR[1024]);
+		GetWindowText(inquiryHwnd, windowTitleBuffer.get(), 1024);
+		auto windowTitle = wstring(windowTitleBuffer.get());
+
+		if (!RegexMatch(sw.windowTitle.windowTitle, windowTitle))
+		{
+			return false;
+		}
+	}
+	if (sw.className.enable)
+	{
+		unique_ptr<TCHAR[]> classNameBuffer(new TCHAR[1024]);
+		GetClassName(inquiryHwnd, classNameBuffer.get(), 1024);
+		auto className = wstring(classNameBuffer.get());
+
+		if (!RegexMatch(sw.className.className, className))
+		{
+			return false;
+		}
+	}
+	if (sw.style.enable)
+	{
+		if (sw.style.matchType == StyleMatchTypeEnum::Subset)
+		{
+			if ((GetWindowLong(inquiryHwnd, GWL_STYLE) & sw.style.style) != sw.style.style)
+				return false;
+		}
+		else // Exact
+		{
+			if (GetWindowLong(inquiryHwnd, GWL_STYLE) != sw.style.style)
+				return false;
+		}
+	}
+	if (sw.processName.enable)
+	{
+		DWORD processId = 0;
+		GetWindowThreadProcessId(inquiryHwnd, &processId);
+		wstring processName = L"";
+		if (processId != 0)
+		{
+			// 尝试打开进程句柄
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
+
+			if (hProcess)
+			{
+				wchar_t fullPath[MAX_PATH];
+				DWORD size = MAX_PATH;
+
+				// 获取完整路径 (Win7+)
+				if (QueryFullProcessImageNameW(hProcess, 0, fullPath, &size)) {
+					// 使用 filesystem 获取文件名部分（例如从 C:\A\B.exe 提取出 B.exe）
+					processName = std::filesystem::path(fullPath).filename().wstring();
+				}
+				CloseHandle(hProcess);
+			}
+		}
+
+		if (sw.processName.processName != processName)
+		{
+			return false;
+		}
+	}
+	if (sw.size.enable)
+	{
+		RECT rect{};
+		HRESULT hr = DwmGetWindowAttribute(inquiryHwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
+		if (FAILED(hr) || (rect.right - rect.left == 0))
+		{
+			GetWindowRect(inquiryHwnd, &rect);
+		}
+
+		int twidth = rect.right - rect.left;
+		int theight = rect.bottom - rect.top;
+
+		// 定义一个小的容差范围，防止缩放产生的 1-2 像素误差
+		const int pixelTolerance = 2;
+
+		if (sw.size.MatchType == SizeMatchTypeEnum::Exact)
+		{
+			if (twidth != sw.size.width || theight != sw.size.height)
+				return false;
+		}
+		else if (sw.size.MatchType == SizeMatchTypeEnum::Scale)
+		{
+			// 比例匹配：除了比例一致，还要确保窗口不是太小（避免除以0）
+			if (sw.size.width == 0 || sw.size.height == 0) return false;
+
+			float widthRatio = static_cast<float>(twidth) / static_cast<float>(sw.size.width);
+			float heightRatio = static_cast<float>(theight) / static_cast<float>(sw.size.height);
+
+			if (abs(widthRatio - heightRatio) > 0.03f)
+				return false;
+		}
+		else if (sw.size.MatchType == SizeMatchTypeEnum::DPIScale)
+		{
+			// 3. 获取 DPI
+			HDC hdc = GetDC(inquiryHwnd); // 最好获取目标窗口所在 DC 的 DPI
+			int dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+			int dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+			ReleaseDC(inquiryHwnd, hdc);
+
+			float scaleX = dpiX / 96.0f;
+			float scaleY = dpiY / 96.0f;
+
+			// 计算理论上的缩放后尺寸
+			float targetW = static_cast<float>(sw.size.width) * scaleX;
+			float targetH = static_cast<float>(sw.size.height) * scaleY;
+
+			// 判断：由于缩放舍入（如 1.25, 1.5），允许 ±2 像素误差
+			if (abs(targetW - twidth) > (float)pixelTolerance ||
+				abs(targetH - theight) > (float)pixelTolerance)
+				return false;
+		}
+		else if (sw.size.MatchType == SizeMatchTypeEnum::FullScreen)
+		{
+			if (twidth != GetSystemMetrics(SM_CXSCREEN) || theight != GetSystemMetrics(SM_CYSCREEN))
+				return false;
+		}
+	}
+
+	return true;
+}
 BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 {
 	EnumChildWindows(inquiryHwnd, EnumWindowsCallback, lParam);
 
+	// 检测窗口处理
+	for (auto x : detectObjectList)
+	{
+		bool res = IsMatchWindow(x.first, inquiryHwnd);
+
+		if (res)
+		{
+			cerr << "Find(Detection) " + string(magic_enum::enum_name(x.second)) << " " << (int)inquiryHwnd << endl;
+			foundDetectWindows[x.second] = true;
+		}
+	}
+	// 拦截窗口处理
 	for (auto i : magic_enum::enum_values<InterceptObjectEnum>())
 	{
+		if (!windowUnionList[i].enable) continue;
 		for (auto& sw : windowUnionList[i].windows)
 		{
-			if (sw.windowTitle.enable)
-			{
-				unique_ptr<TCHAR[]> windowTitleBuffer(new TCHAR[1024]);
-				GetWindowText(inquiryHwnd, windowTitleBuffer.get(), 1024);
-				auto windowTitle = wstring(windowTitleBuffer.get());
-
-				if (!RegexMatch(sw.windowTitle.windowTitle, windowTitle))
-				{
-					continue;
-				}
-			}
-			if (sw.className.enable)
-			{
-				unique_ptr<TCHAR[]> classNameBuffer(new TCHAR[1024]);
-				GetClassName(inquiryHwnd, classNameBuffer.get(), 1024);
-				auto className = wstring(classNameBuffer.get());
-
-				if (!RegexMatch(sw.className.className, className))
-				{
-					continue;
-				}
-			}
-			if (sw.style.enable)
-			{
-				if (sw.style.matchType == StyleMatchTypeEnum::Subset)
-				{
-					if ((GetWindowLong(inquiryHwnd, GWL_STYLE) & sw.style.style) != sw.style.style)
-						continue;
-				}
-				else // Exact
-				{
-					if (GetWindowLong(inquiryHwnd, GWL_STYLE) != sw.style.style)
-						continue;
-				}
-			}
-			if (sw.processName.enable)
-			{
-				DWORD processId = 0;
-				GetWindowThreadProcessId(inquiryHwnd, &processId);
-				wstring processName = L"";
-				if (processId != 0)
-				{
-					// 尝试打开进程句柄
-					HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
-
-					if (hProcess)
-					{
-						wchar_t fullPath[MAX_PATH];
-						DWORD size = MAX_PATH;
-
-						// 获取完整路径 (Win7+)
-						if (QueryFullProcessImageNameW(hProcess, 0, fullPath, &size)) {
-							// 使用 filesystem 获取文件名部分（例如从 C:\A\B.exe 提取出 B.exe）
-							processName = std::filesystem::path(fullPath).filename().wstring();
-						}
-						CloseHandle(hProcess);
-					}
-				}
-
-				if (sw.processName.processName != processName)
-				{
-					continue;
-				}
-			}
-			if (sw.size.enable)
-			{
-				RECT rect{};
-				HRESULT hr = DwmGetWindowAttribute(inquiryHwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
-				if (FAILED(hr) || (rect.right - rect.left == 0))
-				{
-					GetWindowRect(inquiryHwnd, &rect);
-				}
-
-				int twidth = rect.right - rect.left;
-				int theight = rect.bottom - rect.top;
-
-				// 定义一个小的容差范围，防止缩放产生的 1-2 像素误差
-				const int pixelTolerance = 2;
-
-				if (sw.size.MatchType == SizeMatchTypeEnum::Exact)
-				{
-					if (twidth != sw.size.width || theight != sw.size.height)
-						continue;
-				}
-				else if (sw.size.MatchType == SizeMatchTypeEnum::Scale)
-				{
-					// 比例匹配：除了比例一致，还要确保窗口不是太小（避免除以0）
-					if (sw.size.width == 0 || sw.size.height == 0) continue;
-
-					float widthRatio = static_cast<float>(twidth) / static_cast<float>(sw.size.width);
-					float heightRatio = static_cast<float>(theight) / static_cast<float>(sw.size.height);
-
-					if (abs(widthRatio - heightRatio) > 0.03f)
-						continue;
-				}
-				else if (sw.size.MatchType == SizeMatchTypeEnum::DPIScale)
-				{
-					// 3. 获取 DPI
-					HDC hdc = GetDC(inquiryHwnd); // 最好获取目标窗口所在 DC 的 DPI
-					int dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
-					int dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
-					ReleaseDC(inquiryHwnd, hdc);
-
-					float scaleX = dpiX / 96.0f;
-					float scaleY = dpiY / 96.0f;
-
-					// 计算理论上的缩放后尺寸
-					float targetW = static_cast<float>(sw.size.width) * scaleX;
-					float targetH = static_cast<float>(sw.size.height) * scaleY;
-
-					// 判断：由于缩放舍入（如 1.25, 1.5），允许 ±2 像素误差
-					if (abs(targetW - twidth) > (float)pixelTolerance ||
-						abs(targetH - theight) > (float)pixelTolerance)
-						continue;
-				}
-				else if (sw.size.MatchType == SizeMatchTypeEnum::FullScreen)
-				{
-					if (twidth != GetSystemMetrics(SM_CXSCREEN) || theight != GetSystemMetrics(SM_CYSCREEN))
-						continue;
-				}
-			}
+			bool res = IsMatchWindow(sw, inquiryHwnd);
 
 			// Successfully matched
-			cerr << "Find " + string(magic_enum::enum_name(i)) << " " << (int)inquiryHwnd << endl;
 
-			foundInterceptWindows.push_back({ &sw, inquiryHwnd });
+			if (res)
+			{
+				cerr << "Find " + string(magic_enum::enum_name(i)) << " " << (int)inquiryHwnd << endl;
+				foundInterceptWindows.push_back({ &sw, inquiryHwnd });
+			}
 		}
 	}
 
@@ -215,6 +239,8 @@ bool DdbIntercept()
 	bool hasIntercept = false;
 
 	foundInterceptWindows.clear();
+	foundDetectWindows.clear();
+
 	EnumWindows(EnumWindowsCallback, 0);
 
 	for (auto fw : foundInterceptWindows)
@@ -254,7 +280,10 @@ bool DdbIntercept()
 				{
 					hasIntercept = true;
 					ShowWindow(hwnd, SW_MINIMIZE);
+
+					cerr << "Minimize " << (int)h << endl;
 				}
+				else cerr << "Minimize(Fail) " << (int)h << endl;
 			}
 			if (interceptType == InterceptTypeEnum::Hide)
 			{
@@ -262,6 +291,7 @@ bool DdbIntercept()
 				{
 					hasIntercept = true;
 					ShowWindow(h, SW_HIDE);
+
 					cerr << "Hide " << (int)h << endl;
 				}
 				else cerr << "Hide(Fail) " << (int)h << endl;
@@ -273,17 +303,34 @@ bool DdbIntercept()
 				int x = rect.left;
 				int y = rect.top;
 
-				if (x != -32000 || y != -32000)
+				if (fw.first->autoRecover.enable && foundDetectWindows[fw.first->autoRecover.detectTarget] == true)
 				{
-					fw.first->autoRecover.prevX = x;
-					fw.first->autoRecover.prevY = y;
+					// 特殊情况恢复显示
+					int tx = autoRecoverPositions[hwnd].first;
+					int ty = autoRecoverPositions[hwnd].second;
 
-					hasIntercept = true;
-					SetWindowPos(hwnd, NULL, -32000, -32000, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+					if (x == -32000 && y == -32000)
+					{
+						SetWindowPos(hwnd, NULL, tx, ty, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 
-					cerr << "Move " << (int)h << endl;
+						cerr << "UnMove " << (int)h << endl;
+					}
+					else cerr << "UnMove(Fail) " << (int)h << endl;
 				}
-				else cerr << "Move(Fail) " << (int)h << endl;
+				else
+				{
+					// 常规拦截
+					if (x != -32000 || y != -32000)
+					{
+						autoRecoverPositions[hwnd] = { x,y };
+
+						hasIntercept = true;
+						SetWindowPos(hwnd, NULL, -32000, -32000, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+
+						cerr << "Move " << (int)h << endl;
+					}
+					else cerr << "Move(Fail) " << (int)h << endl;
+				}
 			}
 		}
 	}

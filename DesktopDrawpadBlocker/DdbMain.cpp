@@ -552,6 +552,10 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.processName.enable = true;
 					ws.processName.processName = L"teach.exe";
 				}
+				{
+					ws.autoRecover.enable = true;
+					ws.autoRecover.detectTarget = DetectObjectEnum::Iclass30Whiteboard;
+				}
 				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.emplace_back(ws);
 			}
 			{
@@ -578,6 +582,10 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.size.enable = true;
 					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
 				}
+				{
+					ws.autoRecover.enable = true;
+					ws.autoRecover.detectTarget = DetectObjectEnum::Iclass30Whiteboard;
+				}
 				ws.interceptScope = InterceptScopeEnum::Self;
 				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.emplace_back(ws);
 			}
@@ -601,6 +609,10 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.processName.enable = true;
 					ws.processName.processName = L"teach.exe";
 				}
+				{
+					ws.autoRecover.enable = true;
+					ws.autoRecover.detectTarget = DetectObjectEnum::Iclass30Whiteboard;
+				}
 				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.emplace_back(ws);
 			}
 			{
@@ -623,6 +635,10 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.processName.enable = true;
 					ws.processName.processName = L"teach.exe";
 				}
+				{
+					ws.autoRecover.enable = true;
+					ws.autoRecover.detectTarget = DetectObjectEnum::Iclass30Whiteboard;
+				}
 				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.emplace_back(ws);
 			}
 			{
@@ -644,6 +660,10 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				{
 					ws.processName.enable = true;
 					ws.processName.processName = L"teach.exe";
+				}
+				{
+					ws.autoRecover.enable = true;
+					ws.autoRecover.detectTarget = DetectObjectEnum::Iclass30Whiteboard;
 				}
 				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.emplace_back(ws);
 			}
@@ -695,6 +715,83 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				}
 				windowUnionList[InterceptObjectEnum::Iclass30SidebarFloating].windows.emplace_back(ws);
 			}
+		}
+	}
+
+	// 检测配置初始化
+	{
+		// 畅言4.0 白板
+		{
+			WindowSearchStruct ws;
+			ws.interceptType = InterceptTypeEnum::Detection;
+			{
+				ws.windowTitle.enable = true;
+				ws.windowTitle.windowTitle = LR"(畅言智慧课堂-白板[-A-Za-z]*)";
+			}
+			{
+				ws.className.enable = true;
+				ws.className.className = LR"(Qt5QWindowIcon)";
+			}
+			{
+				ws.style.enable = true;
+				ws.style.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+				ws.style.matchType = StyleMatchTypeEnum::Subset;
+			}
+			{
+				ws.processName.enable = true;
+				ws.processName.processName = L"ifly.qzk.slabBoard.exe";
+			}
+			detectObjectList.emplace_back(make_pair(ws, DetectObjectEnum::ChangYan4Whiteboard));
+		}
+		// 畅言5.0 白板
+		{
+			WindowSearchStruct ws;
+			ws.interceptType = InterceptTypeEnum::Detection;
+			{
+				ws.windowTitle.enable = true;
+				ws.windowTitle.windowTitle = LR"(畅言智慧课堂-白板[-A-Za-z]*)";
+			}
+			{
+				ws.className.enable = true;
+				ws.className.className = LR"(Qt5152QWindowIcon)";
+			}
+			{
+				ws.style.enable = true;
+				ws.style.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+				ws.style.matchType = StyleMatchTypeEnum::Subset;
+			}
+			{
+				ws.processName.enable = true;
+				ws.processName.processName = L"ifly.qzk.slabBoard.exe";
+			}
+			detectObjectList.emplace_back(make_pair(ws, DetectObjectEnum::ChangYan5Whiteboard));
+		}
+		// C30 白板
+		{
+			WindowSearchStruct ws;
+			ws.interceptType = InterceptTypeEnum::Detection;
+			{
+				ws.windowTitle.enable = true;
+				ws.windowTitle.windowTitle = LR"(超级白板\d+)";
+			}
+			{
+				ws.className.enable = true;
+				ws.className.className = LR"(wb_CWhiteBoardPageWnd)";
+			}
+			{
+				ws.style.enable = true;
+				ws.style.style = WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_GROUP | WS_TABSTOP | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+				ws.style.matchType = StyleMatchTypeEnum::Subset;
+			}
+			{
+				ws.processName.enable = true;
+				ws.processName.processName = L"super_wb.exe";
+			}
+			{
+				ws.size.enable = true;
+				ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+			}
+			detectObjectList.emplace_back(make_pair(ws, DetectObjectEnum::Iclass30Whiteboard));
 		}
 	}
 
@@ -877,6 +974,12 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			DdbWriteSetting(true);
 			return 0;
+		}
+
+		// 一些项缺省关闭
+		{
+			windowUnionList[InterceptObjectEnum::SeewoPincoSideBarFloating].enable = false;
+			windowUnionList[InterceptObjectEnum::Iclass30SidebarFloating].enable = false;
 		}
 
 		DdbReadSetting();
