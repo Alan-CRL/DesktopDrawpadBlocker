@@ -1,6 +1,9 @@
 # DesktopDrawpadBlocker 桌面画板悬浮窗拦截器
 DesktopDrawpadBlocker，Windows 软件插件，致力于剔除桌面上 希沃白板桌面悬浮窗等 杂乱无章的桌面画板悬浮窗，还您一个干净的桌面。
 
+## 软件初衷
+特别是在教学一体机上，一些白板软件的桌面悬浮窗画笔功能不能直接关闭，桌面上会出现多家画笔工具的悬浮窗。这容易导致老师混用不同的工具导致无法继续批注，这严重影响了教学效率。于是 DesktopDrawpadBlocker 应运而生，同时作为插件位于 [智绘教Inkeys](https://github.com/Alan-CRL/Inkeys) 中。
+
 ## 软件简介
 DesktopDrawpadBlocker 其原理类似弹窗拦截，会自动关闭 希沃白板桌面悬浮窗 和 希沃PPT小工具 等窗口并具有高度自定义化。
 **DesktopDrawpadBlocker 是作为 Windows 软件的插件程序，其并没有 UI界面，位于后台运行。**  
@@ -14,7 +17,7 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
   您的软件启动后开启 DDB，并指定您软件的路径，当 DDB 检测到您的软件关闭后，也会同步关闭
   **重要** 此模式时，如果宿主程序未开启，程序将无法启动  
 - 同步模式（随宿主程序关闭）
-  启动DDB后，您的软件可能启动/未启动，当 DDB 检测到您的软件关闭后（先前检测到启动过），也会同步关闭
+  启动 DDB 后，您的软件可能启动/未启动，当 DDB 检测到您的软件关闭后（先前检测到启动过），也会同步关闭
 - 独立模式
   您的软件可以设置 DDB 开启自动启动，来达到全时段拦截的效果（宿主软件与 DDB 互不干扰）。想要关闭 DDB 则需要通过 json 的交互完成。
 > 拓展：（可选）独立模式下，当宿主程序被关闭后，拦截到其他软件的窗口后，重启宿主程序
@@ -38,14 +41,22 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 | AiClass 桌面画笔悬浮窗 | `AiClassFloating` ||| 5.19.3.2 |
 | ClassIn X 桌面画笔悬浮窗 | `ClassInXFloating` ||| 6.0.5.3913 |
 | 天喻教育云互动课堂 桌面画笔悬浮窗（包括PPT控件） | `IntelligentClassFloating` ||| 3.1.3 |
-| 畅言智慧课堂4.0 桌面画笔悬浮窗（包括PPT控件） | `ChangYanFloating` | 支持在畅言白板时自动恢复 | 需要DDB管理员 | 4.28.2 |
-| 畅言智慧课堂5.0 桌面画笔悬浮窗（包括PPT控件） | `ChangYan5Floating` | 支持在畅言白板时自动恢复 | 需要DDB管理员 | 5.7.0.1 |
-| C30智能教学 桌面画笔悬浮窗（包括PPT控件） | `Iclass30Floating` | 支持在C30白板时自动恢复 | 需要DDB管理员 | 1.3.1460.0 |
+| 畅言智慧课堂4.0 桌面画笔悬浮窗（包括PPT控件） | `ChangYanFloating` | 自动恢复 | 需要DDB管理员 | 4.28.2 |
+| 畅言智慧课堂5.0 桌面画笔悬浮窗（包括PPT控件） | `ChangYan5Floating` | 自动恢复 | 需要DDB管理员 | 5.7.0.1 |
 | C30智能教学 侧栏悬浮窗 | `Iclass30SidebarFloating` || 需要DDB管理员 | 1.3.1460.0 |
-| 希沃桌面 桌面画笔悬浮窗 | `SeewoDesktopAnnotationFloating` || 需要DDB管理员; 1.0/2.0/2.5/3.0 普教版/高教版 通用 ||
-| 希沃桌面 侧栏悬浮窗 | `SeewoDesktopSideBarFloating` || 需要DDB管理员; 1.0/2.0/2.5/3.0 普教版/高教版 通用 ||
+| C30智能教学 桌面画笔悬浮窗（包括PPT控件） | `Iclass30Floating` | 自动恢复和窗口追踪 | 需要DDB管理员 | 1.3.1460.0 |
+| 希沃桌面 侧栏悬浮窗 | `SeewoDesktopSideBarFloating` || 需要DDB管理员; 1.0/2.0/2.5/3.0 普教版/高教版 通用 | S.6.0.3.63; 1.0.0.63; 7.0.0.25; 8.1.0.49 |
+| 希沃桌面 桌面画笔悬浮窗 | `SeewoDesktopDrawingFloating` || 需要DDB管理员; 1.0/2.0/2.5/3.0 普教版/高教版 通用 | S.6.0.3.63; 1.0.0.63; 7.0.0.25; 8.1.0.49 |
 
-如果有新的拦截需求，请添加 Issues
+如果有新的拦截需求，请添加 Issues。  
+
+## 高级功能
+### 自动恢复
+一些软件的桌面画笔悬浮窗和白板界面悬浮窗为同一窗口，此功能则可以在识别到处于白板界面的情况下，恢复显示悬浮窗，使白板功能正常使用。
+
+### 窗口追踪
+一些软件的窗口状态改变过于迅速，窗口追踪功能将在拦截失效的时候立即进行拦截（而不是等待至下一轮拦截），以保证体验。  
+**特别的**，如果同时拥有自动恢复功能，请不要将拦截间隔设置超过 5000 毫秒，否则将出现在白板界面时需要较长时间才能使悬浮窗显示。  
 
 ## 兼容性
 程序使用 C++20 编写，最低兼容 Windows 7 RTM（sp0），并且单文件运行无需额外的运行库。运行时内存占用仅约 **5MB**。
@@ -87,10 +98,10 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 
 [utf8 string] `Edition`：表示 DDB 版本，由 DDB 反馈  
 [bool] `~ConfigurationChange`：当配置更改时应写为 true，DDB 将更新配置  
-> 启动程序时此项因为 true（开启自启时除外），当 DDB 成功读取配置后，该项将变为 false
+> 启动程序时此项应为 true（开启自启时除外），当 DDB 成功读取配置后，该项将变为 false
 
 [bool] `~KeepOpen`：决定程序是否需要开启，**手动关闭程序，将此项写为 false 即可**  
-> 启动程序时此项因为 true（开启自启时除外），当程序关闭后此项将变为 false
+> 启动程序时此项应为 true（开启自启时除外），当程序关闭后此项将变为 false
 
 [int32] `SleepTime`：每次扫描窗口的间隔（单位 ms）  
 
@@ -131,7 +142,7 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 
 按照以下步骤关闭 DDB：
 
-1. 将配置写入 json 文，指定 `~ConfigurationChange` 为 true，`~KeepOpen` 为 false  
+1. 将配置写入 json 文件，指定 `~ConfigurationChange` 为 true，`~KeepOpen` 为 false  
 （DDB 关闭成功后，`~ConfigurationChange` 和 `~KeepOpen` 变为 false）
 
 `!` **Tips** DDB 只会在主循环 2-3 步骤时读取并反馈配置，注意不是实时反应。  
@@ -149,5 +160,7 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 `A` Utf8 或 Utf8 BOM（带签名），程序输出的 json 和输入编码一致。   
 
 ## 项目引用
-[智绘教Inkeys](https://github.com/Alan-CRL/Intelligent-Drawing-Teaching)  
-[JsonCpp](https://github.com/open-source-parsers/jsoncpp)  
+[Alan-CRL/Inkeys](https://github.com/Alan-CRL/Inkeys)  
+[open-source-parsers/jsoncpp](https://github.com/open-source-parsers/jsoncpp)  
+[Neargye/magic_enum](https://github.com/Neargye/magic_enum)  
+[efficient/libcuckoo](https://github.com/efficient/libcuckoo)  

@@ -227,6 +227,16 @@ bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd)
 			if (twidth != GetSystemMetrics(SM_CXSCREEN) || theight != GetSystemMetrics(SM_CYSCREEN))
 				return false;
 		}
+		else if (sw.size.MatchType == SizeMatchTypeEnum::FullHeight)
+		{
+			if (theight != GetSystemMetrics(SM_CYSCREEN))
+				return false;
+		}
+		else if (sw.size.MatchType == SizeMatchTypeEnum::FullWidth)
+		{
+			if (twidth != GetSystemMetrics(SM_CXSCREEN))
+				return false;
+		}
 	}
 
 	return true;

@@ -739,6 +739,114 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				windowUnionList[InterceptObjectEnum::Iclass30Floating].windows.emplace_back(ws);
 			}
 		}
+		// SeewoDesktopSideBarFloating
+		{
+			// 希沃桌面 侧栏悬浮窗
+			{
+				WindowSearchStruct ws;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				{
+					ws.windowTitle.enable = true;
+					ws.windowTitle.windowTitle = LR"(ResidentSideBar)";
+				}
+				{
+					ws.className.enable = true;
+					ws.className.className = LR"(HwndWrapper\[ResidentSideBar.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				}
+				{
+					ws.style.enable = true;
+					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_MAXIMIZE | WS_SYSMENU;
+				}
+				{
+					ws.processName.enable = true;
+					ws.processName.processName = L"ResidentSideBar.exe";
+				}
+				{
+					ws.size.enable = true;
+					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+				}
+				windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].windows.emplace_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				{
+					ws.windowTitle.enable = true;
+					ws.windowTitle.windowTitle = LR"(SideBar)";
+				}
+				{
+					ws.className.enable = true;
+					ws.className.className = LR"(HwndWrapper\[ResidentSideBar.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				}
+				{
+					ws.style.enable = true;
+					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				}
+				{
+					ws.processName.enable = true;
+					ws.processName.processName = L"ResidentSideBar.exe";
+				}
+				{
+					ws.size.enable = true;
+					ws.size.MatchType = SizeMatchTypeEnum::FullHeight;
+				}
+				windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].windows.emplace_back(ws);
+			}
+		}
+		// SeewoDesktopDrawingFloating
+		{
+			// 希沃桌面 桌面画笔悬浮窗
+			{
+				WindowSearchStruct ws;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				{
+					ws.windowTitle.enable = true;
+					ws.windowTitle.windowTitle = L"";
+				}
+				{
+					ws.className.enable = true;
+					ws.className.className = LR"(HwndWrapper\[DesktopAnnotation.exe;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				}
+				{
+					ws.style.enable = true;
+					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				}
+				{
+					ws.processName.enable = true;
+					ws.processName.processName = L"DesktopAnnotation.exe";
+				}
+				{
+					ws.size.enable = true;
+					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+				}
+				windowUnionList[InterceptObjectEnum::SeewoDesktopDrawingFloating].windows.emplace_back(ws);
+			}
+			{
+				WindowSearchStruct ws;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				{
+					ws.windowTitle.enable = true;
+					ws.windowTitle.windowTitle = L"";
+				}
+				{
+					ws.className.enable = true;
+					ws.className.className = LR"(HwndWrapper\[DesktopAnnotation;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				}
+				{
+					ws.style.enable = true;
+					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				}
+				{
+					ws.processName.enable = true;
+					ws.processName.processName = L"DesktopAnnotation.exe";
+				}
+				{
+					ws.size.enable = true;
+					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+				}
+				windowUnionList[InterceptObjectEnum::SeewoDesktopDrawingFloating].windows.emplace_back(ws);
+			}
+		}
 	}
 
 	// 检测配置初始化
@@ -871,7 +979,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		{
 			windowUnionList[InterceptObjectEnum::SeewoPincoSideBarFloating].enable = false;
 			windowUnionList[InterceptObjectEnum::Iclass30SidebarFloating].enable = false;
-			windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].enable = false;
+			// windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].enable = false;
 		}
 
 		DdbReadSetting();
@@ -921,6 +1029,8 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 	{
 		thread(WindowTrackerStart).detach();
 	}
+
+	this_thread::sleep_for(chrono::milliseconds(5000));
 
 	// 开始拦截悬浮窗
 	for (; !closeSign; this_thread::sleep_for(chrono::milliseconds(ddbSetList.sleepTime)))

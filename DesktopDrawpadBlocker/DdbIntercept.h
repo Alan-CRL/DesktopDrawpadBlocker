@@ -35,6 +35,8 @@ enum class SizeMatchTypeEnum
 	DPIScale,	// 跟随DPI比例
 	Scale,		// 成比例
 	FullScreen,	// 全屏幕
+	FullHeight,	// 全高度
+	FullWidth,	// 全宽度
 };
 // 检测对象
 enum class DetectObjectEnum
@@ -75,7 +77,7 @@ enum class InterceptObjectEnum : int
 	Iclass30SidebarFloating,
 	Iclass30Floating,
 	SeewoDesktopSideBarFloating,
-	SeewoDesktopAnnotationFloating,
+	SeewoDesktopDrawingFloating,
 };
 // 拦截窗口特征
 struct WindowSearchStruct
