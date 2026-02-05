@@ -67,22 +67,26 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 
 ```json
 {
-	"Edition" : "20250404a",
+	"Edition" : "20260205a",
 	"Intercept" : 
 	{
 		"AiClassFloating" : true,
+		"ChangYan5Floating" : true,
 		"ChangYanFloating" : true,
-		"ChangYanPptFloating" : true,
-		"HiteAnnotationFloating" : true,
+		"ClassInXFloating" : true,
+		"Iclass30Floating" : true,
+		"Iclass30SidebarFloating" : false,
 		"IntelligentClassFloating" : true,
-		"SeewoDesktopAnnotationFloating" : true,
-		"SeewoDesktopSideBarFloating" : true,
+		"SeewoDesktopDrawingFloating" : true,
+		"SeewoDesktopSideBarFloating" : false,
+		"SeewoIwbAssistantFloating" : true,
 		"SeewoPPTFloating" : true,
 		"SeewoPincoDrawingFloating" : true,
-		"SeewoPincoSideBarFloating" : true,
+		"SeewoPincoSideBarFloating" : false,
 		"SeewoWhiteboard3Floating" : true,
 		"SeewoWhiteboard5CFloating" : true,
-		"SeewoWhiteboard5Floating" : true
+		"SeewoWhiteboard5Floating" : true,
+		"YiouBoardFloating" : true
 	},
 	"Mode" : 
 	{

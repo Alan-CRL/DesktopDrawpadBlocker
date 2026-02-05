@@ -240,7 +240,6 @@ bool DdbReadSetting()
 			}
 		}
 
-		/*
 		if (updateVal.isMember("Intercept") && updateVal["Intercept"].isObject())
 		{
 			if (updateVal["Intercept"].isMember("SeewoWhiteboard3Floating") && updateVal["Intercept"]["SeewoWhiteboard3Floating"].isBool())
@@ -257,80 +256,61 @@ bool DdbReadSetting()
 			}
 			if (updateVal["Intercept"].isMember("SeewoPincoSideBarFloating") && updateVal["Intercept"]["SeewoPincoSideBarFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[3] = updateVal["Intercept"]["SeewoPincoSideBarFloating"].asBool();
+				windowUnionList[InterceptObjectEnum::SeewoPincoSideBarFloating].enable = updateVal["Intercept"]["SeewoPincoSideBarFloating"].asBool();
 			}
 			if (updateVal["Intercept"].isMember("SeewoPincoDrawingFloating") && updateVal["Intercept"]["SeewoPincoDrawingFloating"].isBool())
 			{
-				bool temp = updateVal["Intercept"]["SeewoPincoDrawingFloating"].asBool();
-				ddbSetList.InterceptWindow[4] = temp;
-				ddbSetList.InterceptWindow[5] = temp;
+				windowUnionList[InterceptObjectEnum::SeewoPincoDrawingFloating].enable = updateVal["Intercept"]["SeewoPincoDrawingFloating"].asBool();
 			}
 			if (updateVal["Intercept"].isMember("SeewoPPTFloating") && updateVal["Intercept"]["SeewoPPTFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[6] = updateVal["Intercept"]["SeewoPPTFloating"].asBool();
+				windowUnionList[InterceptObjectEnum::SeewoPPTFloating].enable = updateVal["Intercept"]["SeewoPPTFloating"].asBool();
+			}
+			if (updateVal["Intercept"].isMember("SeewoIwbAssistantFloating") && updateVal["Intercept"]["SeewoIwbAssistantFloating"].isBool())
+			{
+				windowUnionList[InterceptObjectEnum::SeewoIwbAssistantFloating].enable = updateVal["Intercept"]["SeewoIwbAssistantFloating"].asBool();
+			}
+			if (updateVal["Intercept"].isMember("YiouBoardFloating") && updateVal["Intercept"]["YiouBoardFloating"].isBool())
+			{
+				windowUnionList[InterceptObjectEnum::YiouBoardFloating].enable = updateVal["Intercept"]["YiouBoardFloating"].asBool();
 			}
 			if (updateVal["Intercept"].isMember("AiClassFloating") && updateVal["Intercept"]["AiClassFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[7] = updateVal["Intercept"]["AiClassFloating"].asBool();
+				windowUnionList[InterceptObjectEnum::AiClassFloating].enable = updateVal["Intercept"]["AiClassFloating"].asBool();
 			}
-			if (updateVal["Intercept"].isMember("HiteAnnotationFloating") && updateVal["Intercept"]["HiteAnnotationFloating"].isBool())
+			if (updateVal["Intercept"].isMember("ClassInXFloating") && updateVal["Intercept"]["ClassInXFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[8] = updateVal["Intercept"]["HiteAnnotationFloating"].asBool();
-			}
-			if (updateVal["Intercept"].isMember("ChangYanFloating") && updateVal["Intercept"]["ChangYanFloating"].isBool())
-			{
-				bool temp = updateVal["Intercept"]["ChangYanFloating"].asBool();
-				ddbSetList.InterceptWindow[9] = temp;
-				ddbSetList.InterceptWindow[10] = temp;
-				ddbSetList.InterceptWindow[11] = temp;
-				ddbSetList.InterceptWindow[12] = temp;
-				ddbSetList.InterceptWindow[13] = temp;
-				ddbSetList.InterceptWindow[14] = temp;
-				ddbSetList.InterceptWindow[15] = temp;
-				ddbSetList.InterceptWindow[16] = temp;
-				ddbSetList.InterceptWindow[17] = temp;
-			}
-			if (updateVal["Intercept"].isMember("ChangYanPptFloating") && updateVal["Intercept"]["ChangYanPptFloating"].isBool())
-			{
-				bool temp = updateVal["Intercept"]["ChangYanPptFloating"].asBool();
-				ddbSetList.InterceptWindow[18] = temp;
-				ddbSetList.InterceptWindow[19] = temp;
-				ddbSetList.InterceptWindow[20] = temp;
-				ddbSetList.InterceptWindow[21] = temp;
+				windowUnionList[InterceptObjectEnum::ClassInXFloating].enable = updateVal["Intercept"]["ClassInXFloating"].asBool();
 			}
 			if (updateVal["Intercept"].isMember("IntelligentClassFloating") && updateVal["Intercept"]["IntelligentClassFloating"].isBool())
 			{
-				bool temp = updateVal["Intercept"]["IntelligentClassFloating"].asBool();
-				ddbSetList.InterceptWindow[22] = temp;
-				ddbSetList.InterceptWindow[23] = temp;
-				ddbSetList.InterceptWindow[24] = temp;
+				windowUnionList[InterceptObjectEnum::IntelligentClassFloating].enable = updateVal["Intercept"]["IntelligentClassFloating"].asBool();
 			}
-			if (updateVal["Intercept"].isMember("SeewoDesktopAnnotationFloating") && updateVal["Intercept"]["SeewoDesktopAnnotationFloating"].isBool())
+			if (updateVal["Intercept"].isMember("ChangYanFloating") && updateVal["Intercept"]["ChangYanFloating"].isBool())
 			{
-				ddbSetList.InterceptWindow[25] = updateVal["Intercept"]["SeewoDesktopAnnotationFloating"].asBool();
+				windowUnionList[InterceptObjectEnum::ChangYanFloating].enable = updateVal["Intercept"]["ChangYanFloating"].asBool();
 			}
-			if (updateVal["Intercept"].isMember("SeewoDesktopSideBarFloating") && updateVal["Intercept"]["SeewoDesktopSideBarFloating"].isBool())
+			if (updateVal["Intercept"].isMember("ChangYan5Floating") && updateVal["Intercept"]["ChangYan5Floating"].isBool())
 			{
-				ddbSetList.InterceptWindow[26] = updateVal["Intercept"]["SeewoDesktopSideBarFloating"].asBool();
-			}
-			if (updateVal["Intercept"].isMember("Iclass30Floating") && updateVal["Intercept"]["Iclass30Floating"].isBool())
-			{
-				auto temp = updateVal["Intercept"]["Iclass30Floating"].asBool();
-				ddbSetList.InterceptWindow[28] = temp;
-				ddbSetList.InterceptWindow[29] = temp;
-				ddbSetList.InterceptWindow[30] = temp;
-				ddbSetList.InterceptWindow[31] = temp;
-				ddbSetList.InterceptWindow[32] = temp;
-				ddbSetList.InterceptWindow[36] = temp;
-				ddbSetList.InterceptWindow[37] = temp;
+				windowUnionList[InterceptObjectEnum::ChangYan5Floating].enable = updateVal["Intercept"]["ChangYan5Floating"].asBool();
 			}
 			if (updateVal["Intercept"].isMember("Iclass30SidebarFloating") && updateVal["Intercept"]["Iclass30SidebarFloating"].isBool())
 			{
-				auto temp = updateVal["Intercept"]["Iclass30SidebarFloating"].asBool();
-				ddbSetList.InterceptWindow[34] = temp;
-				ddbSetList.InterceptWindow[35] = temp;
+				windowUnionList[InterceptObjectEnum::Iclass30SidebarFloating].enable = updateVal["Intercept"]["Iclass30SidebarFloating"].asBool();
 			}
-		}*/
+			if (updateVal["Intercept"].isMember("Iclass30Floating") && updateVal["Intercept"]["Iclass30Floating"].isBool())
+			{
+				windowUnionList[InterceptObjectEnum::Iclass30Floating].enable = updateVal["Intercept"]["Iclass30Floating"].asBool();
+			}
+			if (updateVal["Intercept"].isMember("SeewoDesktopSideBarFloating") && updateVal["Intercept"]["SeewoDesktopSideBarFloating"].isBool())
+			{
+				windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].enable = updateVal["Intercept"]["SeewoDesktopSideBarFloating"].asBool();
+			}
+			if (updateVal["Intercept"].isMember("SeewoDesktopDrawingFloating") && updateVal["Intercept"]["SeewoDesktopDrawingFloating"].isBool())
+			{
+				windowUnionList[InterceptObjectEnum::SeewoDesktopDrawingFloating].enable = updateVal["Intercept"]["SeewoDesktopDrawingFloating"].asBool();
+			}
+		}
 	}
 	else return false;
 
@@ -348,23 +328,23 @@ bool DdbWriteSetting(bool close)
 		updateVal["Mode"]["HostPath"] = Json::Value(utf16ToUtf8(ddbSetList.hostPath));
 		updateVal["Mode"]["RestartHost"] = Json::Value(ddbSetList.restartHost);
 
-		/*
 		updateVal["Intercept"]["SeewoWhiteboard3Floating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoWhiteboard3Floating].enable);
 		updateVal["Intercept"]["SeewoWhiteboard5Floating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].enable);
 		updateVal["Intercept"]["SeewoWhiteboard5CFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].enable);
-		updateVal["Intercept"]["SeewoPincoSideBarFloating"] = Json::Value(ddbSetList.InterceptWindow[3]);
-		updateVal["Intercept"]["SeewoPincoDrawingFloating"] = Json::Value(ddbSetList.InterceptWindow[4]);
-		updateVal["Intercept"]["SeewoPPTFloating"] = Json::Value(ddbSetList.InterceptWindow[6]);
-		updateVal["Intercept"]["AiClassFloating"] = Json::Value(ddbSetList.InterceptWindow[7]);
-		updateVal["Intercept"]["HiteAnnotationFloating"] = Json::Value(ddbSetList.InterceptWindow[8]);
-		updateVal["Intercept"]["ChangYanFloating"] = Json::Value(ddbSetList.InterceptWindow[9]);
-		updateVal["Intercept"]["ChangYanPptFloating"] = Json::Value(ddbSetList.InterceptWindow[18]);
-		updateVal["Intercept"]["IntelligentClassFloating"] = Json::Value(ddbSetList.InterceptWindow[22]);
-		updateVal["Intercept"]["SeewoDesktopAnnotationFloating"] = Json::Value(ddbSetList.InterceptWindow[25]);
-		updateVal["Intercept"]["SeewoDesktopSideBarFloating"] = Json::Value(ddbSetList.InterceptWindow[26]);
-		updateVal["Intercept"]["Iclass30Floating"] = Json::Value(ddbSetList.InterceptWindow[28]);
-		updateVal["Intercept"]["Iclass30SidebarFloating"] = Json::Value(ddbSetList.InterceptWindow[34]);
-		*/
+		updateVal["Intercept"]["SeewoPincoSideBarFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoPincoSideBarFloating].enable);
+		updateVal["Intercept"]["SeewoPincoDrawingFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoPincoDrawingFloating].enable);
+		updateVal["Intercept"]["SeewoPPTFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoPPTFloating].enable);
+		updateVal["Intercept"]["SeewoIwbAssistantFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoIwbAssistantFloating].enable);
+		updateVal["Intercept"]["YiouBoardFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::YiouBoardFloating].enable);
+		updateVal["Intercept"]["AiClassFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::AiClassFloating].enable);
+		updateVal["Intercept"]["ClassInXFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::ClassInXFloating].enable);
+		updateVal["Intercept"]["IntelligentClassFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::IntelligentClassFloating].enable);
+		updateVal["Intercept"]["ChangYanFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::ChangYanFloating].enable);
+		updateVal["Intercept"]["ChangYan5Floating"] = Json::Value(windowUnionList[InterceptObjectEnum::ChangYan5Floating].enable);
+		updateVal["Intercept"]["Iclass30SidebarFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::Iclass30SidebarFloating].enable);
+		updateVal["Intercept"]["Iclass30Floating"] = Json::Value(windowUnionList[InterceptObjectEnum::Iclass30Floating].enable);
+		updateVal["Intercept"]["SeewoDesktopSideBarFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoDesktopSideBarFloating].enable);
+		updateVal["Intercept"]["SeewoDesktopDrawingFloating"] = Json::Value(windowUnionList[InterceptObjectEnum::SeewoDesktopDrawingFloating].enable);
 
 		updateVal["~ConfigurationChange"] = Json::Value(false);
 		updateVal["~KeepOpen"] = Json::Value(!close);

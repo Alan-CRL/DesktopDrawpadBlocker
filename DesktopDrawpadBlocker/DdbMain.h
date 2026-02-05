@@ -1,5 +1,5 @@
 ﻿#pragma once
-// #define DDB_RELEASE
+#define DDB_RELEASE
 
 #include <chrono>
 #include <codecvt>
