@@ -2,6 +2,10 @@
 
 #include "DdbMain.h"
 
+#undef max
+#undef min
+#include "libcuckoo/cuckoohash_map.hh"
+
 // 拦截类型
 enum class InterceptTypeEnum
 {
@@ -40,6 +44,18 @@ enum class DetectObjectEnum
 	Iclass30Whiteboard,
 };
 
+// 窗口追踪
+extern libcuckoo::cuckoohash_map<HWND, InterceptTypeEnum> windowTracker;
+class WindowTrackerRegister
+{
+public:
+	void Register(HWND hwnd, InterceptTypeEnum interceptType)
+	{
+		windowTracker.insert_or_assign(hwnd, interceptType);
+	}
+};
+void WindowTrackerStart();
+
 // 拦截窗口
 enum class InterceptObjectEnum : int
 {
@@ -56,12 +72,10 @@ enum class InterceptObjectEnum : int
 	IntelligentClassFloating,
 	ChangYanFloating,
 	ChangYan5Floating,
-	Iclass30Floating,
 	Iclass30SidebarFloating,
-
-	/*
+	Iclass30Floating,
+	SeewoDesktopSideBarFloating,
 	SeewoDesktopAnnotationFloating,
-	SeewoDesktopSideBarFloating,*/
 };
 // 拦截窗口特征
 struct WindowSearchStruct
@@ -98,11 +112,19 @@ struct WindowSearchStruct
 		SizeMatchTypeEnum MatchType = SizeMatchTypeEnum::Exact;
 	} size;
 
+	// 自动恢复仅适用于 Hide 和 Move 模式
 	struct
 	{
 		bool enable = false;
 		DetectObjectEnum detectTarget;
 	} autoRecover;
+	// 窗口追踪仅适用于 Minimize 和 Hide 和 Move 模式
+	// 注册窗口追踪后，在窗口发出关联变化的时候自动执行 DdbIntercept()
+	struct
+	{
+		bool enable = false;
+		WindowTrackerRegister windowTrackerRegister;
+	} windowTracker;
 
 	InterceptScopeEnum interceptScope = InterceptScopeEnum::SelfAndChild;
 	InterceptTypeEnum interceptType = InterceptTypeEnum::Close;
