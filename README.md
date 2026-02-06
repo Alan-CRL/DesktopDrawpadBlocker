@@ -1,8 +1,5 @@
 # DesktopDrawpadBlocker 桌面画板悬浮窗拦截器
-DesktopDrawpadBlocker，Windows 软件插件，致力于剔除桌面上 希沃白板桌面悬浮窗等 杂乱无章的桌面画板悬浮窗，还您一个干净的桌面。
-
-## 软件初衷
-特别是在教学一体机上，一些白板软件的桌面悬浮窗画笔功能不能直接关闭，桌面上会出现多家画笔工具的悬浮窗。这容易导致老师混用不同的工具导致无法继续批注，这严重影响了教学效率。于是 DesktopDrawpadBlocker 应运而生，同时作为插件位于 [智绘教Inkeys](https://github.com/Alan-CRL/Inkeys) 中。
+在教学一体机上，一些白板软件的桌面悬浮窗画笔功能不能直接关闭，桌面上会出现多家画笔工具的悬浮窗。这容易导致老师混用不同的工具导致无法继续批注，这严重影响了教学效率。于是 DesktopDrawpadBlocker 应运而生。同时作为插件位于 [智绘教Inkeys](https://github.com/Alan-CRL/Inkeys) 中。
 
 ## 软件简介
 DesktopDrawpadBlocker 其原理类似弹窗拦截，会自动关闭 希沃白板桌面悬浮窗 和 希沃PPT小工具 等窗口并具有高度自定义化。
