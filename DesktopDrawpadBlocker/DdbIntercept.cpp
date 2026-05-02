@@ -136,22 +136,41 @@ void WindowTrackerStart()
 
 	return;
 }
+bool IsMatchDetectTarget(DetectObjectEnum detectTarget, HWND inquiryHwnd)
+{
+	for (auto& x : detectObjectList)
+	{
+		if (x.second != detectTarget) continue;
+		if (IsMatchWindow(x.first, inquiryHwnd)) return true;
+	}
+
+	return false;
+}
+BOOL CALLBACK DetectTargetChildCallback(HWND inquiryHwnd, LPARAM lParam)
+{
+	auto params = reinterpret_cast<pair<DetectObjectEnum, bool>*>(lParam);
+	if (params->second) return FALSE;
+
+	if (IsMatchDetectTarget(params->first, inquiryHwnd))
+	{
+		params->second = true;
+		return FALSE;
+	}
+
+	return TRUE;
+}
 BOOL CALLBACK DetectTargetCallback(HWND inquiryHwnd, LPARAM lParam)
 {
 	auto params = reinterpret_cast<pair<DetectObjectEnum, bool>*>(lParam);
 	if (params->second) return FALSE;
 
-	EnumChildWindows(inquiryHwnd, DetectTargetCallback, lParam);
+	EnumChildWindows(inquiryHwnd, DetectTargetChildCallback, lParam);
 	if (params->second) return FALSE;
 
-	for (auto& x : detectObjectList)
+	if (IsMatchDetectTarget(params->first, inquiryHwnd))
 	{
-		if (x.second != params->first) continue;
-		if (IsMatchWindow(x.first, inquiryHwnd))
-		{
-			params->second = true;
-			return FALSE;
-		}
+		params->second = true;
+		return FALSE;
 	}
 
 	return TRUE;
