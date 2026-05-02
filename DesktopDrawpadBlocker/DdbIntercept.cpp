@@ -35,6 +35,14 @@ void CALLBACK WindowTrackerProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND h
 	// 1. 过滤：只处理窗口对象本身的消息，不处理窗口内的按钮、菜单等
 	if (idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
 
+	bool isObjectTrackerEvent =
+		event == EVENT_OBJECT_CREATE ||
+		event == EVENT_OBJECT_SHOW ||
+		event == EVENT_OBJECT_HIDE ||
+		event == EVENT_OBJECT_LOCATIONCHANGE ||
+		event == EVENT_OBJECT_DESTROY;
+	if (!isObjectTrackerEvent && event != EVENT_SYSTEM_MINIMIZESTART) return;
+
 	if (event == EVENT_OBJECT_DESTROY)
 	{
 		windowTracker.erase(hwnd);
