@@ -24,18 +24,36 @@ libcuckoo::cuckoohash_map<HWND, pair<int, int>> autoRecoverPositions;
 
 // 窗口钩子
 libcuckoo::cuckoohash_map<HWND, InterceptTypeEnum> windowTracker;
+libcuckoo::cuckoohash_map<HWND, WindowSearchStruct*> windowTrackerSearches;
+bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd);
+bool IsDetectTargetFound(DetectObjectEnum detectTarget);
+bool RegisterTrackedWindow(HWND hwnd, WindowSearchStruct*& sw);
+bool InterceptTrackedWindow(HWND hwnd, WindowSearchStruct& sw);
+
 void CALLBACK WindowTrackerProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
 	// 1. 过滤：只处理窗口对象本身的消息，不处理窗口内的按钮、菜单等
 	if (idObject != OBJID_WINDOW || idChild != CHILDID_SELF) return;
 
-	// 2. 过滤：只处理我们锁定的那个窗口
-	InterceptTypeEnum interceptType;
-	if (!windowTracker.find(hwnd, interceptType)) return;
 	if (event == EVENT_OBJECT_DESTROY)
 	{
 		windowTracker.erase(hwnd);
+		windowTrackerSearches.erase(hwnd);
+		autoRecoverPositions.erase(hwnd);
 		return;
+	}
+
+	// 2. 过滤：只处理我们锁定的那个窗口，或可以被快速登记的窗口
+	InterceptTypeEnum interceptType;
+	WindowSearchStruct* trackedSearch = nullptr;
+	if (windowTracker.find(hwnd, interceptType))
+	{
+		windowTrackerSearches.find(hwnd, trackedSearch);
+	}
+	else
+	{
+		if (!RegisterTrackedWindow(hwnd, trackedSearch)) return;
+		interceptType = trackedSearch->interceptType;
 	}
 
 	if (interceptType == InterceptTypeEnum::Minimize && event == EVENT_SYSTEM_MINIMIZESTART)
@@ -52,12 +70,19 @@ void CALLBACK WindowTrackerProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND h
 		thread(DdbIntercept).detach();
 		return;
 	}
-	if (interceptType == InterceptTypeEnum::Move && event == EVENT_OBJECT_LOCATIONCHANGE)
+	if (interceptType == InterceptTypeEnum::Move &&
+		(event == EVENT_OBJECT_CREATE || event == EVENT_OBJECT_SHOW || event == EVENT_OBJECT_LOCATIONCHANGE))
 	{
+		if (trackedSearch != nullptr)
+		{
+			InterceptTrackedWindow(hwnd, *trackedSearch);
+			return;
+		}
+
 		RECT rect;
 		GetWindowRect(hwnd, &rect);
 
-		if (rect.left != -32000 || rect.top == -32000)
+		if (rect.left != -32000 || rect.top != -32000)
 		{
 			cerr << "LOCATIONCHANGE call: " << (int)hwnd << endl;
 			thread(DdbIntercept).detach();
@@ -68,10 +93,10 @@ void CALLBACK WindowTrackerProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND h
 }
 void WindowTrackerStart()
 {
-	// 钩子 1: 监控 销毁、隐藏、显示、位置改变
-	// 范围从 0x8001 (DESTROY) 到 0x800B (LOCATIONCHANGE)
+	// 钩子 1: 监控 创建、销毁、隐藏、显示、位置改变
+	// 范围从 0x8000 (CREATE) 到 0x800B (LOCATIONCHANGE)
 	HWINEVENTHOOK hHookObject = SetWinEventHook(
-		EVENT_OBJECT_DESTROY,          // 0x8001
+		EVENT_OBJECT_CREATE,           // 0x8000
 		EVENT_OBJECT_LOCATIONCHANGE,   // 0x800B
 		nullptr,
 		WindowTrackerProc,
@@ -102,6 +127,92 @@ void WindowTrackerStart()
 	UnhookWinEvent(hHookSys);
 
 	return;
+}
+BOOL CALLBACK DetectTargetCallback(HWND inquiryHwnd, LPARAM lParam)
+{
+	auto params = reinterpret_cast<pair<DetectObjectEnum, bool>*>(lParam);
+	if (params->second) return FALSE;
+
+	EnumChildWindows(inquiryHwnd, DetectTargetCallback, lParam);
+	if (params->second) return FALSE;
+
+	for (auto& x : detectObjectList)
+	{
+		if (x.second != params->first) continue;
+		if (IsMatchWindow(x.first, inquiryHwnd))
+		{
+			params->second = true;
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+bool IsDetectTargetFound(DetectObjectEnum detectTarget)
+{
+	pair<DetectObjectEnum, bool> params(detectTarget, false);
+	EnumWindows(DetectTargetCallback, reinterpret_cast<LPARAM>(&params));
+
+	return params.second;
+}
+bool RegisterTrackedWindow(HWND hwnd, WindowSearchStruct*& sw)
+{
+	if (!IsWindow(hwnd)) return false;
+
+	for (auto i : magic_enum::enum_values<InterceptObjectEnum>())
+	{
+		if (!windowUnionList[i].enable) continue;
+		for (auto& search : windowUnionList[i].windows)
+		{
+			if (!search.windowTracker.enable) continue;
+			if (!IsMatchWindow(search, hwnd)) continue;
+
+			sw = &search;
+			windowTracker.insert_or_assign(hwnd, search.interceptType);
+			windowTrackerSearches.insert_or_assign(hwnd, sw);
+
+			cerr << "WindowTracker(Register) " << (int)hwnd << endl;
+			return true;
+		}
+	}
+
+	return false;
+}
+bool InterceptTrackedWindow(HWND hwnd, WindowSearchStruct& sw)
+{
+	if (sw.interceptType != InterceptTypeEnum::Move) return false;
+
+	RECT rect{};
+	if (!GetWindowRect(hwnd, &rect)) return false;
+
+	int x = rect.left;
+	int y = rect.top;
+
+	if (sw.autoRecover.enable && IsDetectTargetFound(sw.autoRecover.detectTarget))
+	{
+		pair<int, int> tmp;
+		if (autoRecoverPositions.find(hwnd, tmp) && x == -32000 && y == -32000)
+		{
+			SetWindowPos(hwnd, NULL, tmp.first, tmp.second, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+
+			cerr << "WindowTracker(UnMove) " << (int)hwnd << endl;
+			return true;
+		}
+
+		return false;
+	}
+
+	if (x != -32000 || y != -32000)
+	{
+		autoRecoverPositions.insert_or_assign(hwnd, make_pair(x, y));
+
+		SetWindowPos(hwnd, NULL, -32000, -32000, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+
+		cerr << "WindowTracker(Move) " << (int)hwnd << endl;
+		return true;
+	}
+
+	return false;
 }
 
 // 窗口查找
@@ -374,6 +485,7 @@ bool DdbIntercept()
 				if (fw.first->windowTracker.enable)
 				{
 					windowTracker.insert_or_assign(h, InterceptTypeEnum::Minimize);
+					windowTrackerSearches.insert_or_assign(h, fw.first);
 					cerr << "WindowTracker(Minimize) " << (int)h << endl;
 				}
 
@@ -391,6 +503,7 @@ bool DdbIntercept()
 				if (fw.first->windowTracker.enable)
 				{
 					windowTracker.insert_or_assign(h, InterceptTypeEnum::Hide);
+					windowTrackerSearches.insert_or_assign(h, fw.first);
 					cerr << "WindowTracker(Hide) " << (int)h << endl;
 				}
 
@@ -429,6 +542,7 @@ bool DdbIntercept()
 				if (fw.first->windowTracker.enable)
 				{
 					windowTracker.insert_or_assign(h, InterceptTypeEnum::Move);
+					windowTrackerSearches.insert_or_assign(h, fw.first);
 					cerr << "WindowTracker(Move) " << (int)h << endl;
 				}
 

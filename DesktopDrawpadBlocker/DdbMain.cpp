@@ -25,7 +25,7 @@
 #include <fstream>
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-wstring editionDate = L"20260205a";				//发布版本
+wstring editionDate = L"20260502a";				//发布版本
 
 wstring userid;									//用户ID
 wstring globalPath;								//程序根路径
@@ -994,7 +994,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 	}
 	// 创建测试控制台
 	{
-#ifndef DDB_RELEASE
+	#ifndef DDB_RELEASE
 		{
 			AllocConsole();
 
@@ -1017,7 +1017,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 
 			std::wcout.imbue(std::locale("chs"));
 		}
-#endif
+	#endif
 	}
 	// 启动窗口追踪
 	{
