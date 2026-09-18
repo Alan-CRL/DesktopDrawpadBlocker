@@ -25,7 +25,7 @@
 #include <fstream>
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-wstring editionDate = L"20260502a";				//发布版本
+wstring editionDate = L"20260918a";				//发布版本
 
 wstring userid;									//用户ID
 wstring globalPath;								//程序根路径
@@ -57,6 +57,32 @@ bool closeSign;
 
 int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR lpCmdLine, int /*nCmdShow*/)
 {
+	/*
+	* 用于调试
+	{
+		// 创建控制台
+		AllocConsole();
+
+		// 将 C Runtime 的标准流重定向到新控制台
+		FILE* fp = nullptr;
+
+		freopen_s(&fp, "CONIN$", "r", stdin);
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+		freopen_s(&fp, "CONOUT$", "w", stderr);
+
+		// 可选：修改控制台标题
+		SetConsoleTitleW(L"Debug Console");
+
+		// 可选：让 iostream 清除之前可能存在的错误状态
+		std::cin.clear();
+		std::cout.clear();
+		std::cerr.clear();
+		std::wcin.clear();
+		std::wcout.clear();
+		std::wcerr.clear();
+	}
+	*/
+
 	// 防止重复启动
 	{
 		if (ProcessRunningCnt(GetCurrentExePath()) > 1) return 0;
@@ -103,34 +129,64 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 		}
 		// SeewoWhiteboard5Floating
 		{
-			// 希沃白板5 桌面画笔悬浮窗
-			WindowSearchStruct ws;
-			ws.interceptType = InterceptTypeEnum::Hide;
 			{
-				ws.windowTitle.enable = true;
-				ws.windowTitle.windowTitle = L"";
+				// 希沃白板5 桌面画笔画布
+				WindowSearchStruct ws;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				{
+					ws.windowTitle.enable = true;
+					ws.windowTitle.windowTitle = L"";
+				}
+				{
+					ws.className.enable = true;
+					ws.className.className = LR"(HwndWrapper\[EasiNote;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				}
+				{
+					ws.style.enable = true;
+					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				}
+				{
+					ws.processName.enable = true;
+					ws.processName.processName = L"EasiNote.exe";
+				}
+				{
+					ws.size.enable = true;
+					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+				}
+				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.emplace_back(ws);
 			}
 			{
-				ws.className.enable = true;
-				ws.className.className = LR"(HwndWrapper\[EasiNote;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				// 希沃白板5 桌面画笔悬浮窗
+				WindowSearchStruct ws;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				{
+					ws.windowTitle.enable = true;
+					ws.windowTitle.windowTitle = L"";
+				}
+				{
+					ws.className.enable = true;
+					ws.className.className = LR"(HwndWrapper\[EasiNote;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				}
+				{
+					ws.style.enable = true;
+					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+				}
+				{
+					ws.processName.enable = true;
+					ws.processName.processName = L"EasiNote.exe";
+				}
+				{
+					ws.size.enable = true;
+					ws.size.MatchType = SizeMatchTypeEnum::Scale;
+					ws.size.width = 550;
+					ws.size.height = 200;
+				}
+				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.emplace_back(ws);
 			}
-			{
-				ws.style.enable = true;
-				ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
-			}
-			{
-				ws.processName.enable = true;
-				ws.processName.processName = L"EasiNote.exe";
-			}
-			{
-				ws.size.enable = true;
-				ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
-			}
-			windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.emplace_back(ws);
 		}
 		// SeewoWhiteboard5CFloating
 		{
-			// 希沃轻白板（5C） 桌面画笔悬浮窗
+			// 希沃轻白板（5C） 桌面画笔画布
 			{
 				WindowSearchStruct ws;
 				ws.interceptType = InterceptTypeEnum::Hide;
@@ -154,6 +210,35 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				{
 					ws.size.enable = true;
 					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+				}
+				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.emplace_back(ws);
+			}
+			// 希沃轻白板（5C） 桌面画笔悬浮窗
+			{
+				WindowSearchStruct ws;
+				ws.interceptType = InterceptTypeEnum::Hide;
+				{
+					ws.windowTitle.enable = true;
+					ws.windowTitle.windowTitle = L"";
+				}
+				{
+					ws.className.enable = true;
+					ws.className.className = LR"(HwndWrapper\[EasiNote5C;;[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\])";
+				}
+				{
+					ws.style.enable = true;
+					ws.style.style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU;
+					ws.style.matchType = StyleMatchTypeEnum::Subset;
+				}
+				{
+					ws.processName.enable = true;
+					ws.processName.processName = L"EasiNote5C.exe";
+				}
+				{
+					ws.size.enable = true;
+					ws.size.MatchType = SizeMatchTypeEnum::Scale;
+					ws.size.width = 550;
+					ws.size.height = 200;
 				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.emplace_back(ws);
 			}
