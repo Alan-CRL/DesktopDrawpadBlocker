@@ -28,8 +28,8 @@ DDB 使用 GPLv3 开源协议，可以作为您的软件的插件，您的软件
 | 名称 | 标识名 | 高级功能 | 备注 | 测试时版本 |
 |---|---|---|---|---|
 | 希沃白板3 桌面画笔悬浮窗 | `SeewoWhiteboard3Floating` ||| 3.1.2.3606 |
-| 希沃白板5 桌面画笔悬浮窗 | `SeewoWhiteboard5Floating` ||| 5.2.4.9592 |
-| 希沃轻白板（5C） 桌面画笔悬浮窗 | `SeewoWhiteboard5CFloating` ||| 1.0.1.9068 |
+| 希沃白板5 桌面画笔悬浮窗 | `SeewoWhiteboard5Floating` ||| 5.2.4.11441 |
+| 希沃轻白板（5C） 桌面画笔悬浮窗 | `SeewoWhiteboard5CFloating` ||| 1.0.1.9830 |
 | 希沃品课教师端 侧栏悬浮窗 | `SeewoPincoSideBarFloating` ||| v1.2.43.7298 |
 | 希沃品课教师端 桌面画笔悬浮窗（包括PPT控件） | `SeewoPincoDrawingFloating` ||| v1.2.43.7298 |
 | 希沃PPT小工具 | `SeewoPPTFloating` ||| 1.0.0.795 |
