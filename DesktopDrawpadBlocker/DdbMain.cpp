@@ -151,7 +151,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				}
 				{
 					ws.size.enable = true;
-					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+					ws.size.MatchType = SizeMatchTypeEnum::Scale; ws.size.width = 0; ws.size.height = 0;	// 不匹配任何全屏画布（含板中板），只保留悬浮窗拦截
 				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.emplace_back(ws);
 			}
@@ -209,7 +209,7 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 				}
 				{
 					ws.size.enable = true;
-					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
+					ws.size.MatchType = SizeMatchTypeEnum::Scale; ws.size.width = 0; ws.size.height = 0;	// 不匹配任何全屏画布（含板中板），只保留悬浮窗拦截
 				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.emplace_back(ws);
 			}
