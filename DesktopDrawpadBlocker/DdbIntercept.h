@@ -100,6 +100,12 @@ struct WindowSearchStruct
 		LONG style;
 		StyleMatchTypeEnum matchType = StyleMatchTypeEnum::Subset;
 	} style;
+	struct
+	{
+		bool enable = false;
+		LONG exStyle;
+		StyleMatchTypeEnum matchType = StyleMatchTypeEnum::Subset;
+	} exStyle;
 
 	struct
 	{
