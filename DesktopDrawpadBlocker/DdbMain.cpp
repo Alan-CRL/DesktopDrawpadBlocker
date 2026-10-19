@@ -153,6 +153,12 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.size.enable = true;
 					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
 				}
+				{
+					// 桌面画笔进程包含此启动标记，用于区分板中板窗口。
+					ws.processCommandLine.enable = true;
+					ws.processCommandLine.pattern = L"--StartupSession";
+					ws.processCommandLine.matchType = CommandLineMatchTypeEnum::Contains;
+				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.emplace_back(ws);
 			}
 			{
@@ -180,6 +186,12 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.size.MatchType = SizeMatchTypeEnum::Scale;
 					ws.size.width = 550;
 					ws.size.height = 200;
+				}
+				{
+					// 桌面画笔进程包含此启动标记，用于区分板中板窗口。
+					ws.processCommandLine.enable = true;
+					ws.processCommandLine.pattern = L"--StartupSession";
+					ws.processCommandLine.matchType = CommandLineMatchTypeEnum::Contains;
 				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5Floating].windows.emplace_back(ws);
 			}
@@ -211,6 +223,12 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.size.enable = true;
 					ws.size.MatchType = SizeMatchTypeEnum::FullScreen;
 				}
+				{
+					// 桌面画笔进程包含此启动标记，用于区分板中板窗口。
+					ws.processCommandLine.enable = true;
+					ws.processCommandLine.pattern = L"--StartupSession";
+					ws.processCommandLine.matchType = CommandLineMatchTypeEnum::Contains;
+				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.emplace_back(ws);
 			}
 			// 希沃轻白板（5C） 桌面画笔悬浮窗
@@ -239,6 +257,12 @@ int WINAPI wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR
 					ws.size.MatchType = SizeMatchTypeEnum::Scale;
 					ws.size.width = 550;
 					ws.size.height = 200;
+				}
+				{
+					// 桌面画笔进程包含此启动标记，用于区分板中板窗口。
+					ws.processCommandLine.enable = true;
+					ws.processCommandLine.pattern = L"--StartupSession";
+					ws.processCommandLine.matchType = CommandLineMatchTypeEnum::Contains;
 				}
 				windowUnionList[InterceptObjectEnum::SeewoWhiteboard5CFloating].windows.emplace_back(ws);
 			}

@@ -6,6 +6,7 @@
 #include <string>
 #include <tchar.h>
 #include <dwmapi.h>
+#include <wrl/client.h>
 
 #pragma comment(lib, "dwmapi.lib")
 
@@ -25,7 +26,8 @@ libcuckoo::cuckoohash_map<HWND, pair<int, int>> autoRecoverPositions;
 // 窗口钩子
 libcuckoo::cuckoohash_map<HWND, InterceptTypeEnum> windowTracker;
 libcuckoo::cuckoohash_map<HWND, WindowSearchStruct*> windowTrackerSearches;
-bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd);
+using ProcessCommandLineCache = unordered_map<DWORD, pair<bool, wstring>>;
+bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd, ProcessCommandLineCache* commandLineCache = nullptr);
 bool IsDetectTargetFound(DetectObjectEnum detectTarget);
 bool RegisterTrackedWindow(HWND hwnd, WindowSearchStruct*& sw);
 bool InterceptTrackedWindow(HWND hwnd, WindowSearchStruct& sw);
@@ -186,13 +188,14 @@ bool RegisterTrackedWindow(HWND hwnd, WindowSearchStruct*& sw)
 {
 	if (!IsWindow(hwnd)) return false;
 
+	ProcessCommandLineCache commandLineCache;
 	for (auto i : magic_enum::enum_values<InterceptObjectEnum>())
 	{
 		if (!windowUnionList[i].enable) continue;
 		for (auto& search : windowUnionList[i].windows)
 		{
 			if (!search.windowTracker.enable) continue;
-			if (!IsMatchWindow(search, hwnd)) continue;
+			if (!IsMatchWindow(search, hwnd, &commandLineCache)) continue;
 
 			sw = &search;
 			windowTracker.insert_or_assign(hwnd, search.interceptType);
@@ -242,8 +245,64 @@ bool InterceptTrackedWindow(HWND hwnd, WindowSearchStruct& sw)
 	return false;
 }
 
+// 按 PID 查询命令行，由 WMI 处理不同位数的目标进程，兼容 Windows 7。
+static bool TryGetProcessCommandLine(DWORD processId, wstring& commandLine)
+{
+	commandLine.clear();
+	if (processId == 0) return false;
+
+	HRESULT comResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (FAILED(comResult) && comResult != RPC_E_CHANGED_MODE) return false;
+	struct ComCleanup
+	{
+		bool initialized;
+		~ComCleanup()
+		{
+			if (initialized) CoUninitialize();
+		}
+	} comCleanup{ SUCCEEDED(comResult) };
+
+	// COM 对象在 comCleanup 之前释放；已有其他线程模型时沿用当前初始化。
+	Microsoft::WRL::ComPtr<IWbemLocator> locator;
+	HRESULT hr = CoCreateInstance(CLSID_WbemLocator, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(locator.GetAddressOf()));
+	if (FAILED(hr)) return false;
+
+	using BstrPtr = unique_ptr<OLECHAR, decltype(&SysFreeString)>;
+	BstrPtr namespacePath(SysAllocString(L"ROOT\\CIMV2"), &SysFreeString);
+	if (!namespacePath) return false;
+
+	Microsoft::WRL::ComPtr<IWbemServices> services;
+	hr = locator->ConnectServer(namespacePath.get(), nullptr, nullptr, nullptr, WBEM_FLAG_CONNECT_USE_MAX_WAIT, nullptr, nullptr, services.GetAddressOf());
+	if (FAILED(hr)) return false;
+	hr = CoSetProxyBlanket(services.Get(), RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE);
+	if (FAILED(hr)) return false;
+
+	wstring query = L"SELECT CommandLine FROM Win32_Process WHERE ProcessId = " + to_wstring(processId);
+	BstrPtr queryLanguage(SysAllocString(L"WQL"), &SysFreeString);
+	BstrPtr queryText(SysAllocString(query.c_str()), &SysFreeString);
+	if (!queryLanguage || !queryText) return false;
+
+	Microsoft::WRL::ComPtr<IEnumWbemClassObject> enumerator;
+	hr = services->ExecQuery(queryLanguage.get(), queryText.get(), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, enumerator.GetAddressOf());
+	if (FAILED(hr)) return false;
+
+	Microsoft::WRL::ComPtr<IWbemClassObject> process;
+	ULONG returned = 0;
+	// 限制结果等待时间，超时或进程退出均视为读取失败。
+	hr = enumerator->Next(1000, 1, process.GetAddressOf(), &returned);
+	if (FAILED(hr) || returned != 1 || !process) return false;
+
+	VARIANT value;
+	VariantInit(&value);
+	hr = process->Get(L"CommandLine", 0, &value, nullptr, nullptr);
+	bool success = SUCCEEDED(hr) && value.vt == VT_BSTR && value.bstrVal != nullptr;
+	if (success) commandLine.assign(value.bstrVal, SysStringLen(value.bstrVal));
+	VariantClear(&value);
+	return success;
+}
+
 // 窗口查找
-bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd)
+bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd, ProcessCommandLineCache* commandLineCache)
 {
 	if (sw.windowTitle.enable)
 	{
@@ -377,6 +436,35 @@ bool IsMatchWindow(WindowSearchStruct& sw, HWND inquiryHwnd)
 		}
 	}
 
+	if (sw.processCommandLine.enable)
+	{
+		if (sw.processCommandLine.pattern.empty()) return false;
+
+		DWORD processId = 0;
+		if (GetWindowThreadProcessId(inquiryHwnd, &processId) == 0 || processId == 0) return false;
+
+		// 缓存仅限本次扫描或追踪登记，失败结果也复用，下一轮重新查询。
+		ProcessCommandLineCache localCache;
+		auto& cache = commandLineCache ? *commandLineCache : localCache;
+		auto [entry, inserted] = cache.try_emplace(processId);
+		auto& [success, commandLine] = entry->second;
+		if (inserted) success = TryGetProcessCommandLine(processId, commandLine);
+		// 启用参数识别后，读取失败不能回退到原有条件，以免误拦截板中板。
+		if (!success) return false;
+
+		switch (sw.processCommandLine.matchType)
+		{
+		case CommandLineMatchTypeEnum::Contains:
+			return commandLine.find(sw.processCommandLine.pattern) != wstring::npos;
+		case CommandLineMatchTypeEnum::Exact:
+			return commandLine == sw.processCommandLine.pattern;
+		case CommandLineMatchTypeEnum::RegexExact:
+			return RegexMatch(sw.processCommandLine.pattern, commandLine);
+		default:
+			return false;
+		}
+	}
+
 	return true;
 }
 BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
@@ -386,7 +474,7 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 	// 检测窗口处理
 	for (auto x : detectObjectList)
 	{
-		bool res = IsMatchWindow(x.first, inquiryHwnd);
+		bool res = IsMatchWindow(x.first, inquiryHwnd, reinterpret_cast<ProcessCommandLineCache*>(lParam));
 
 		if (res)
 		{
@@ -400,7 +488,7 @@ BOOL CALLBACK EnumWindowsCallback(HWND inquiryHwnd, LPARAM lParam)
 		if (!windowUnionList[i].enable) continue;
 		for (auto& sw : windowUnionList[i].windows)
 		{
-			bool res = IsMatchWindow(sw, inquiryHwnd);
+			bool res = IsMatchWindow(sw, inquiryHwnd, reinterpret_cast<ProcessCommandLineCache*>(lParam));
 
 			// Successfully matched
 
@@ -476,7 +564,8 @@ bool DdbIntercept()
 	foundInterceptWindows.clear();
 	foundDetectWindows.clear();
 
-	EnumWindows(EnumWindowsCallback, 0);
+	ProcessCommandLineCache commandLineCache;
+	EnumWindows(EnumWindowsCallback, reinterpret_cast<LPARAM>(&commandLineCache));
 
 	for (auto fw : foundInterceptWindows)
 	{

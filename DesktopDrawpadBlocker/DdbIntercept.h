@@ -28,6 +28,13 @@ enum class StyleMatchTypeEnum
 	Exact,      // 精确匹配
 	Subset,		// 子集匹配
 };
+// 启动命令行匹配类型
+enum class CommandLineMatchTypeEnum
+{
+	Contains,    // 包含连续子串
+	Exact,       // 字符串全匹配
+	RegexExact,  // 正则全匹配
+};
 // 尺寸匹配类型
 enum class SizeMatchTypeEnum
 {
@@ -106,6 +113,13 @@ struct WindowSearchStruct
 		bool enable = false;
 		wstring processName;
 	} processName;
+
+	struct
+	{
+		bool enable = false;
+		wstring pattern;
+		CommandLineMatchTypeEnum matchType = CommandLineMatchTypeEnum::Contains;
+	} processCommandLine;
 
 	struct
 	{
