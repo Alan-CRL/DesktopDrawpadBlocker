@@ -25,7 +25,7 @@
 #include <fstream>
 
 wstring buildTime = __DATE__ L" " __TIME__;		//构建时间
-wstring editionDate = L"20260918a";				//发布版本
+wstring editionDate = L"20261019a";				//发布版本
 
 wstring userid;									//用户ID
 wstring globalPath;								//程序根路径
